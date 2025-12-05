@@ -25,6 +25,9 @@ class Technicien
     #[ORM\Column(nullable: true)]
     private ?\DateTime $dateObtention = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $motDePasseTech = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -74,6 +77,18 @@ class Technicien
     public function setDateObtention(?\DateTime $dateObtention): static
     {
         $this->dateObtention = $dateObtention;
+
+        return $this;
+    }
+
+    public function getMotDePasseTech(): ?string
+    {
+        return $this->motDePasseTech;
+    }
+
+    public function setMotDePasseTech(string $motDePasseTech): static
+    {
+        $this->motDePasseTech = $motDePasseTech;
 
         return $this;
     }

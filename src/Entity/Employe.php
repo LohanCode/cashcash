@@ -28,6 +28,9 @@ class Employe
     #[ORM\Column(nullable: true)]
     private ?\DateTime $dateEmbauche = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $motDePasseGerant = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,6 +92,18 @@ class Employe
     public function setDateEmbauche(?\DateTime $dateEmbauche): static
     {
         $this->dateEmbauche = $dateEmbauche;
+
+        return $this;
+    }
+
+    public function getMotDePasseGerant(): ?string
+    {
+        return $this->motDePasseGerant;
+    }
+
+    public function setMotDePasseGerant(string $motDePasseGerant): static
+    {
+        $this->motDePasseGerant = $motDePasseGerant;
 
         return $this;
     }
