@@ -10,7 +10,7 @@ use App\Repository\EmployeRepository;
 
 class GestionnaireController extends AbstractController
 {
-    #[Route('/gestionnaire/accueil-dev', name: 'app_gestionnaire_accueil_dev')]
+    #[Route('/gerant', name: 'app_gerant_accueil')]
     public function index(): Response
     {
         return $this->render('gestionnaire/index.html.twig', [
@@ -18,7 +18,7 @@ class GestionnaireController extends AbstractController
         ]);
     }
     
-    #[Route('/gestionnaire/affectation-dev', name: 'app_gestionnaire_affectation')]
+    #[Route('/gestionnaire/affectation-dev', name: 'app_gerant_affectation')]
     public function affectation(InterventionRepository $interventionRepository, EmployeRepository $employeRepository): Response
     {
         return $this->render('gestionnaire/affectation.html.twig', [
@@ -27,7 +27,7 @@ class GestionnaireController extends AbstractController
         ]);
     }
 
-    #[Route('/gestionnaire/statistiques-dev', name: 'app_gestionnaire_statistiques')]
+    #[Route('/gestionnaire/statistiques-dev', name: 'app_gerant_statistiques')]
     public function statistiques(): Response
     {
         return $this->render('gestionnaire/statistiques.html.twig', [
