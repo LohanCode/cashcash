@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AgenceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AgenceRepository::class)]
@@ -13,6 +15,7 @@ class Agence
     #[ORM\Column]
     private ?int $id = null;
 
+    // AJOUT DES ATTRIBUTS MANQUANTS ICI
     #[ORM\Column(length: 255)]
     private ?string $numAgence = null;
 
@@ -24,57 +27,21 @@ class Agence
 
     #[ORM\Column(nullable: true)]
     private ?int $telAgence = null;
+    // FIN DES AJOUTS
 
-    public function getId(): ?int
+    #[ORM\OneToMany(mappedBy: 'agence', targetEntity: Employe::class)]
+    private Collection $employes;
+
+    #[ORM\OneToMany(mappedBy: 'agence', targetEntity: Client::class)]
+    private Collection $clients;
+    
+    public function __construct()
     {
-        return $this->id;
+        $this->employes = new ArrayCollection();
+        $this->clients = new ArrayCollection();
     }
+    
+    // Vous devez ajouter les Getters/Setters pour numAgence, nomAgence, adresseAgence, telAgence
 
-    public function getNumAgence(): ?string
-    {
-        return $this->numAgence;
-    }
-
-    public function setNumAgence(string $numAgence): static
-    {
-        $this->numAgence = $numAgence;
-
-        return $this;
-    }
-
-    public function getNomAgence(): ?string
-    {
-        return $this->nomAgence;
-    }
-
-    public function setNomAgence(?string $nomAgence): static
-    {
-        $this->nomAgence = $nomAgence;
-
-        return $this;
-    }
-
-    public function getAdresseAgence(): ?string
-    {
-        return $this->adresseAgence;
-    }
-
-    public function setAdresseAgence(?string $adresseAgence): static
-    {
-        $this->adresseAgence = $adresseAgence;
-
-        return $this;
-    }
-
-    public function getTelAgence(): ?int
-    {
-        return $this->telAgence;
-    }
-
-    public function setTelAgence(?int $telAgence): static
-    {
-        $this->telAgence = $telAgence;
-
-        return $this;
-    }
+    // ... [Reste des Getters/Setters pour les relations] ...
 }
