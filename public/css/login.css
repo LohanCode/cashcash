@@ -1,117 +1,86 @@
-/* Centrage total */
+/* Supprime les marges du body */
 body {
-    background: #f5f6fa;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     margin: 0;
     font-family: Arial, sans-serif;
+    background: #f2f2f2;
 }
 
-/* Fond assombri façon modal (optionnel) */
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.35);
-    z-index: 0;
-}
-
-/* La fenêtre de login */
+/* Wrapper qui centre tout */
 .login-wrapper {
-    background: #ffffff;
-    width: 380px;
-    padding: 30px 25px;
+    height: 100vh;                   /* pleine hauteur écran */
+    display: flex;                   /* flexbox */
+    justify-content: center;         /* centre horizontalement */
+    align-items: center;             /* centre verticalement */
+}
+
+/* La fenêtre modal */
+.login-form {
+    width: 350px;
+    padding: 25px;
+    background: white;
     border-radius: 12px;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
-    position: relative;
-    z-index: 1;
-    animation: fadeIn 0.5s ease-out;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
 }
 
-/* Animation d’apparition */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
+/* Titre */
 .login-form h2 {
     text-align: center;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
     font-weight: 600;
-    font-size: 24px;
-    color: #333;
 }
 
 /* Labels */
 .login-form label {
-    display: block;
-    margin-top: 14px;
-    font-size: 15px;
-    font-weight: 500;
-    color: #444;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-size: 14px;
 }
 
-/* Champs */
+/* Inputs */
 .login-form input[type="text"],
 .login-form input[type="password"] {
-    width: 100%;
     padding: 10px;
-    margin-top: 6px;
     border-radius: 8px;
     border: 1px solid #ccc;
-    font-size: 15px;
+    width: 100%;
     box-sizing: border-box;
-    transition: 0.2s;
 }
 
-.login-form input:focus {
-    border-color: #4c7cff;
-    outline: none;
-    box-shadow: 0 0 4px rgba(76, 124, 255, 0.3);
-}
-
-/* Remember me */
+/* Checkbox */
 .remember-me {
-    margin: 10px 0 5px;
-    font-size: 14px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.remember-me label {
+    margin-left: 8px;
 }
 
 /* Bouton */
 .login-form button {
-    width: 100%;
+    margin-top: 20px;
     padding: 12px;
-    margin-top: 18px;
-    background: #4c7cff;
+    background: #0066ff;
     border: none;
+    color: white;
     border-radius: 8px;
     font-size: 16px;
-    color: white;
     cursor: pointer;
-    transition: 0.25s;
-    font-weight: 600;
+    transition: 0.2s;
 }
 
 .login-form button:hover {
-    background: #3a63d1;
+    background: #0050cc;
 }
 
-/* Message d’erreur */
+/* Messages d’erreur */
 .alert {
-    margin-top: 10px;
     padding: 10px;
-    border-radius: 6px;
     background: #ffdddd;
-    color: #a33;
-    font-size: 14px;
-    text-align: center;
+    color: #a30000;
+    margin-bottom: 15px;
+    border-radius: 6px;
 }

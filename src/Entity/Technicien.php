@@ -4,29 +4,30 @@ namespace App\Entity;
 
 use App\Repository\TechnicienRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: TechnicienRepository::class)]
-class Technicien
+class Technicien implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 50, unique: true)]
     private ?string $matricule = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $telMobile = null;
+    #[ORM\Column(length: 180, unique: true)]
+    private ?string $email = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $qualif = null;
+    #[ORM\Column]
+    private array $roles = [];
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTime $dateObtention = null;
+    #[ORM\Column]
+    private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $motDePasseTech = null;
+    // ----------- GETTERS / SETTERS -----------
 
     public function getId(): ?int
     {
@@ -38,58 +39,60 @@ class Technicien
         return $this->matricule;
     }
 
-    public function setMatricule(string $matricule): static
+    public function setMatricule(string $matricule): self
     {
         $this->matricule = $matricule;
-
         return $this;
     }
 
-    public function getTelMobile(): ?int
+    public function getEmail(): ?string
     {
-        return $this->telMobile;
+        return $this->email;
     }
 
-    public function setTelMobile(?int $telMobile): static
+    public function setEmail(string $email): self
     {
-        $this->telMobile = $telMobile;
-
+        $this->email = $email;
         return $this;
     }
 
-    public function getQualif(): ?string
+    // Identifiant principal pour la connexion
+    public function getUserIdentifier(): string
     {
-        return $this->qualif;
+        return $this->email; // ou return $this->matricule; si tu veux
     }
 
-    public function setQualif(?string $qualif): static
+    public function getUsername(): string
     {
-        $this->qualif = $qualif;
+        return $this->getUserIdentifier();
+    }
 
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        $roles[] = 'ROLE_TECHNICIEN';
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
         return $this;
     }
 
-    public function getDateObtention(): ?\DateTime
+    public function getPassword(): ?string
     {
-        return $this->dateObtention;
+        return $this->password;
     }
 
-    public function setDateObtention(?\DateTime $dateObtention): static
+    public function setPassword(string $password): self
     {
-        $this->dateObtention = $dateObtention;
-
+        $this->password = $password;
         return $this;
     }
 
-    public function getMotDePasseTech(): ?string
+    public function eraseCredentials()
     {
-        return $this->motDePasseTech;
-    }
-
-    public function setMotDePasseTech(string $motDePasseTech): static
-    {
-        $this->motDePasseTech = $motDePasseTech;
-
-        return $this;
+        // si tu stockes des données sensibles (ex: plainPassword)
     }
 }
