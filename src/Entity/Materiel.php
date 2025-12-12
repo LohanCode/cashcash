@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MaterielRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -29,69 +31,98 @@ class Materiel
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $emplacement = null;
 
-    public function getId(): ?int
+    // 1. Relation ManyToOne avec Client
+    #[ORM\ManyToOne(inversedBy: 'materiels')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Client $client = null;
+
+    // 2. Relation ManyToOne avec TypeMateriel
+    #[ORM\ManyToOne(inversedBy: 'materiels')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?TypeMateriel $typeMateriel = null;
+
+    // 3. Relation ManyToOne avec ContratMaintenance (peut être NULL)
+    #[ORM\ManyToOne(inversedBy: 'materielsAssures')]
+    private ?ContratMaintenance $contratMaintenance = null;
+
+    // 4. Relation OneToMany avec la table de jointure Controler
+    #[ORM\OneToMany(mappedBy: 'materiel', targetEntity: Controler::class)]
+    private Collection $controlers;
+
+    public function __construct()
     {
-        return $this->id;
+        $this->controlers = new ArrayCollection();
+    }
+    
+    // ... [Getters/Setters pour les champs de base] ...
+
+    // -----------------------------------------------------------
+    // Getters/Setters pour les Relations
+    // -----------------------------------------------------------
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
     }
 
-    public function getNumSerie(): ?string
+    public function setClient(?Client $client): static
     {
-        return $this->numSerie;
-    }
-
-    public function setNumSerie(string $numSerie): static
-    {
-        $this->numSerie = $numSerie;
+        $this->client = $client;
 
         return $this;
     }
 
-    public function getDateVente(): ?\DateTime
+    public function getTypeMateriel(): ?TypeMateriel
     {
-        return $this->dateVente;
+        return $this->typeMateriel;
     }
 
-    public function setDateVente(?\DateTime $dateVente): static
+    public function setTypeMateriel(?TypeMateriel $typeMateriel): static
     {
-        $this->dateVente = $dateVente;
+        $this->typeMateriel = $typeMateriel;
 
         return $this;
     }
 
-    public function getDateInstallation(): ?\DateTime
+    public function getContratMaintenance(): ?ContratMaintenance
     {
-        return $this->dateInstallation;
+        return $this->contratMaintenance;
     }
 
-    public function setDateInstallation(?\DateTime $dateInstallation): static
+    public function setContratMaintenance(?ContratMaintenance $contratMaintenance): static
     {
-        $this->dateInstallation = $dateInstallation;
+        $this->contratMaintenance = $contratMaintenance;
 
         return $this;
     }
 
-    public function getPrixVente(): ?string
+    /**
+     * @return Collection<int, Controler>
+     */
+    public function getControlers(): Collection
     {
-        return $this->prixVente;
+        return $this->controlers;
     }
 
-    public function setPrixVente(?string $prixVente): static
+    public function addControler(Controler $controler): static
     {
-        $this->prixVente = $prixVente;
+        if (!$this->controlers->contains($controler)) {
+            $this->controlers->add($controler);
+            $controler->setMateriel($this);
+        }
 
         return $this;
     }
 
-    public function getEmplacement(): ?string
+    public function removeControler(Controler $controler): static
     {
-        return $this->emplacement;
-    }
-
-    public function setEmplacement(?string $emplacement): static
-    {
-        $this->emplacement = $emplacement;
+        if ($this->controlers->removeElement($controler)) {
+            // set the owning side to null (unless already changed)
+            if ($controler->getMateriel() === $this) {
+                $controler->setMateriel(null);
+            }
+        }
 
         return $this;
     }
-
 }

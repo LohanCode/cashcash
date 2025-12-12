@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\InterventionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,52 +16,119 @@ class Intervention
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $numIntervenant = null;
+    // Supprime la colonne numIntervenant, remplacée par la relation technicien
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTime $dateVisite = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateVisite = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    private ?\DateTime $heureVisite = null;
+    private ?\DateTimeInterface $heureVisite = null;
 
+    // 1. Relation ManyToOne avec Client (le client concerné par l'intervention)
+    #[ORM\ManyToOne(inversedBy: 'interventions')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Client $client = null;
+
+    // 2. Relation ManyToOne avec Employe (le Technicien affecté)
+    #[ORM\ManyToOne(inversedBy: 'interventionsAffectees')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Employe $technicien = null; // Nommé 'technicien' mais pointe vers l'entité Employe
+
+    // 3. Relation OneToMany avec Controler (la table qui porte les détails du contrôle)
+    #[ORM\OneToMany(mappedBy: 'intervention', targetEntity: Controler::class)]
+    private Collection $controles;
+
+
+    public function __construct()
+    {
+        $this->controles = new ArrayCollection();
+    }
+    
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNumIntervenant(): ?string
-    {
-        return $this->numIntervenant;
-    }
+    // Le getter/setter pour numIntervenant n'est plus nécessaire
 
-    public function setNumIntervenant(string $numIntervenant): static
-    {
-        $this->numIntervenant = $numIntervenant;
-
-        return $this;
-    }
-
-    public function getDateVisite(): ?\DateTime
+    public function getDateVisite(): ?\DateTimeInterface
     {
         return $this->dateVisite;
     }
 
-    public function setDateVisite(?\DateTime $dateVisite): static
+    public function setDateVisite(?\DateTimeInterface $dateVisite): static
     {
         $this->dateVisite = $dateVisite;
 
         return $this;
     }
 
-    public function getHeureVisite(): ?\DateTime
+    public function getHeureVisite(): ?\DateTimeInterface
     {
         return $this->heureVisite;
     }
 
-    public function setHeureVisite(?\DateTime $heureVisite): static
+    public function setHeureVisite(?\DateTimeInterface $heureVisite): static
     {
         $this->heureVisite = $heureVisite;
+
+        return $this;
+    }
+
+    // -----------------------------------------------------------
+    // Getters/Setters pour les Relations
+    // -----------------------------------------------------------
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(?Client $client): static
+    {
+        $this->client = $client;
+
+        return $this;
+    }
+
+    public function getTechnicien(): ?Employe
+    {
+        return $this->technicien;
+    }
+
+    public function setTechnicien(?Employe $technicien): static
+    {
+        $this->technicien = $technicien;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Controler>
+     */
+    public function getControles(): Collection
+    {
+        return $this->controles;
+    }
+
+    public function addControle(Controler $controle): static
+    {
+        if (!$this->controles->contains($controle)) {
+            $this->controles->add($controle);
+            $controle->setIntervention($this);
+        }
+
+        return $this;
+    }
+
+    public function removeControle(Controler $controle): static
+    {
+        if ($this->controles->removeElement($controle)) {
+            // set the owning side to null (unless already changed)
+            if ($controle->getIntervention() === $this) {
+                $controle->setIntervention(null);
+            }
+        }
 
         return $this;
     }

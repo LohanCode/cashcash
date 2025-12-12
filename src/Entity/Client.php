@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ClientRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -40,116 +42,135 @@ class Client
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $distanceKm = null;
+    
+    // 1. Relation ManyToOne avec Agence
+    #[ORM\ManyToOne(inversedBy: 'clients')]
+    #[ORM\JoinColumn(nullable: false)] // Un client DOIT être rattaché à une agence
+    private ?Agence $agence = null;
 
-    public function getId(): ?int
+    // 2. Relation OneToMany avec Materiel
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Materiel::class)]
+    private Collection $materiels;
+
+    // 3. Relation OneToMany avec ContratMaintenance
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: ContratMaintenance::class)]
+    private Collection $contrats;
+
+    // 4. Relation OneToMany avec Intervention
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Intervention::class)]
+    private Collection $interventions;
+
+    public function __construct()
     {
-        return $this->id;
+        $this->materiels = new ArrayCollection();
+        $this->contrats = new ArrayCollection();
+        $this->interventions = new ArrayCollection();
+    }
+    
+    // ... [Getters/Setters pour les champs de base] ...
+
+    // -----------------------------------------------------------
+    // Getters/Setters pour les Relations
+    // -----------------------------------------------------------
+
+    public function getAgence(): ?Agence
+    {
+        return $this->agence;
     }
 
-    public function getNumClient(): ?string
+    public function setAgence(?Agence $agence): static
     {
-        return $this->numClient;
-    }
-
-    public function setNumClient(string $numClient): static
-    {
-        $this->numClient = $numClient;
+        $this->agence = $agence;
 
         return $this;
     }
 
-    public function getRaisSociale(): ?string
+    /**
+     * @return Collection<int, Materiel>
+     */
+    public function getMateriels(): Collection
     {
-        return $this->raisSociale;
+        return $this->materiels;
     }
 
-    public function setRaisSociale(?string $raisSociale): static
+    public function addMateriel(Materiel $materiel): static
     {
-        $this->raisSociale = $raisSociale;
+        if (!$this->materiels->contains($materiel)) {
+            $this->materiels->add($materiel);
+            $materiel->setClient($this);
+        }
 
         return $this;
     }
 
-    public function getSiren(): ?string
+    public function removeMateriel(Materiel $materiel): static
     {
-        return $this->siren;
-    }
-
-    public function setSiren(?string $siren): static
-    {
-        $this->siren = $siren;
+        if ($this->materiels->removeElement($materiel)) {
+            // set the owning side to null (unless already changed)
+            if ($materiel->getClient() === $this) {
+                $materiel->setClient(null);
+            }
+        }
 
         return $this;
     }
 
-    public function getCodeApe(): ?int
+    /**
+     * @return Collection<int, ContratMaintenance>
+     */
+    public function getContrats(): Collection
     {
-        return $this->codeApe;
+        return $this->contrats;
     }
 
-    public function setCodeApe(?int $codeApe): static
+    public function addContrat(ContratMaintenance $contrat): static
     {
-        $this->codeApe = $codeApe;
+        if (!$this->contrats->contains($contrat)) {
+            $this->contrats->add($contrat);
+            $contrat->setClient($this);
+        }
 
         return $this;
     }
 
-    public function getAdresseClient(): ?string
+    public function removeContrat(ContratMaintenance $contrat): static
     {
-        return $this->adresseClient;
-    }
-
-    public function setAdresseClient(?string $adresseClient): static
-    {
-        $this->adresseClient = $adresseClient;
+        if ($this->contrats->removeElement($contrat)) {
+            // set the owning side to null (unless already changed)
+            if ($contrat->getClient() === $this) {
+                $contrat->setClient(null);
+            }
+        }
 
         return $this;
     }
 
-    public function getTelephoneClient(): ?int
+    /**
+     * @return Collection<int, Intervention>
+     */
+    public function getInterventions(): Collection
     {
-        return $this->telephoneClient;
+        return $this->interventions;
     }
 
-    public function setTelephoneClient(?int $telephoneClient): static
+    public function addIntervention(Intervention $intervention): static
     {
-        $this->telephoneClient = $telephoneClient;
+        if (!$this->interventions->contains($intervention)) {
+            $this->interventions->add($intervention);
+            $intervention->setClient($this);
+        }
 
         return $this;
     }
 
-    public function getEmailClient(): ?string
+    public function removeIntervention(Intervention $intervention): static
     {
-        return $this->emailClient;
-    }
-
-    public function setEmailClient(?string $emailClient): static
-    {
-        $this->emailClient = $emailClient;
-
-        return $this;
-    }
-
-    public function getDureeDeplacement(): ?string
-    {
-        return $this->dureeDeplacement;
-    }
-
-    public function setDureeDeplacement(?string $dureeDeplacement): static
-    {
-        $this->dureeDeplacement = $dureeDeplacement;
-
-        return $this;
-    }
-
-    public function getDistanceKm(): ?string
-    {
-        return $this->distanceKm;
-    }
-
-    public function setDistanceKm(?string $distanceKm): static
-    {
-        $this->distanceKm = $distanceKm;
+        if ($this->interventions->removeElement($intervention)) {
+            // set the owning side to null (unless already changed)
+            if ($intervention->getClient() === $this) {
+                $intervention->setClient(null);
+            }
+        }
 
         return $this;
     }
