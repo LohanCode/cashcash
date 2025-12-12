@@ -1,15 +1,11 @@
-/* Centrage total */
+/* Fond général */
 body {
     background: #f5f6fa;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     margin: 0;
     font-family: Arial, sans-serif;
 }
 
-/* Fond assombri façon modal (optionnel) */
+/* Fond assombri façon modal plein écran */
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -17,7 +13,10 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.35);
-    z-index: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* La fenêtre de login */

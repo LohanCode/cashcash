@@ -67,6 +67,21 @@ class Client
         $this->interventions = new ArrayCollection();
     }
     
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getNumClient(): ?string
+    {
+        return $this->numClient;
+    }
+
+    public function getRaisSociale(): ?string
+    {
+        return $this->raisSociale;
+    }
+
     // ... [Getters/Setters pour les champs de base] ...
 
     // -----------------------------------------------------------

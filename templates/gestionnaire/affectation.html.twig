@@ -3,5 +3,76 @@
 {% block title %}Gestion des Affectations{% endblock %}
 
 {% block body %}
-    <h1>Page de Gestion des Affectations</h1>
+    <div class="dashboard-header">
+        <h1>Gestion des affectations</h1>
+        <p>Sélectionnez un technicien pour chaque intervention à affecter.</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="dashboard-card" style="grid-column: 1 / -1; text-align: left;">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Client</th>
+                        <th>Date</th>
+                        <th>Heure</th>
+                        <th>Technicien actuel</th>
+                        <th>Nouvelle affectation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for intervention in interventions %}
+                    <tr>
+                        <td>{{ intervention.id }}</td>
+                        <td>
+                            <form method="post" action="{{ path('app_gerant_affectation') }}" class="d-flex flex-column gap-2">
+                                <input type="hidden" name="intervention_id" value="{{ intervention.id }}">
+                                <select name="client_id" class="form-select form-select-sm" required>
+                                    <option value="">-- Choisir un client --</option>
+                                    {% for client in clients %}
+                                        <option value="{{ client.id }}" {% if intervention.client and client.id == intervention.client.id %}selected{% endif %}>
+                                            {{ client.numClient }} - {{ client.raisSociale ?? '' }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                        </td>
+                        <td>
+                                <input type="date" name="date_visite" class="form-control form-control-sm"
+                                       value="{{ intervention.dateVisite ? intervention.dateVisite|date('Y-m-d') : '' }}">
+                        </td>
+                        <td>
+                                <input type="time" name="heure_visite" class="form-control form-control-sm"
+                                       value="{{ intervention.heureVisite ? intervention.heureVisite|date('H:i') : '' }}">
+                        </td>
+
+                        <td>
+                            {{ intervention.technicien ? (intervention.technicien.nomEmploye ~ ' ' ~ intervention.technicien.prenomEmploye) : 'Non affectée' }}
+                        </td>
+                        <td>
+                                <div class="d-flex gap-2">
+                                <select name="technicien_id" class="form-select form-select-sm" required>
+                                    <option value="">-- Choisir un technicien --</option>
+                                    {% for technicien in techniciens %}
+
+                                        <option value="{{ technicien.id }}">
+                                            {{ technicien.matricule }} - {{ technicien.nomEmploye }} {{ technicien.prenomEmploye }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">Affecter</button>
+                                </div>
+                            </form>
+                        </td>
+
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Aucune intervention trouvée.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

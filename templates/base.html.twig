@@ -77,6 +77,7 @@
                 max-width: 100%;
             }
         </style>
+        {% if app.request.get('_route') != 'app_login' %}
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">
@@ -88,19 +89,25 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_gerant_accueil') }}">
+                                <i class="fas fa-home me-1"></i> Tableau de bord
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#" id="historiqueInterventions">
                                 <i class="fas fa-history me-1"></i> Historique des interventions
                             </a>
                         </li>
                     </ul>
                     <div class="d-flex">
-                        <a href="#" class="btn btn-outline-light">
+                        <a href="{{ path('app_login') }}" class="btn btn-outline-light">
                             <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
                         </a>
                     </div>
                 </div>
             </div>
         </nav>
+        {% endif %}
 
         <div class="container">
             {% for type, messages in app.flashes %}
