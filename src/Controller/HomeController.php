@@ -11,8 +11,9 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(): Response
     {
-        return $this->render('home/index.html.twig');
+        return $this->render('base.html.twig');
     }
+<<<<<<< HEAD
 
     #[Route('/tech', name: 'tech_home')]
     public function techHome(): Response
@@ -46,3 +47,6 @@ class HomeController extends AbstractController
         return $this->render('tech/recherche_client.html.twig');
     }
 }
+=======
+}
+>>>>>>> 81928a82543547004224e328cba8902727d1a593
