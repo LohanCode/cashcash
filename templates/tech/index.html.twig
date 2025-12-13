@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord technicien{% endblock %}
+
+{% block body %}
+<div class="cc-app">
+    {% include 'tech/_header.html.twig' %}
+
+    <main class="cc-main">
+        <h1 class="cc-page-title">Tableau de bord</h1>
+
+        {# Page d'accueil technicien : readonly = true (fourni par le contrôleur) #}
+        {% include 'tech/_carte_intervention.html.twig' with { readonly: readonly } %}
+
+        <div class="cc-footer-actions">
+            {# Sur la home, on n'affiche pas le gros bouton si lecture seule #}
+            {% if not readonly and is_granted('ROLE_GERANT') %}
+                <a href="{{ path('intervention_mes') }}" class="cc-btn cc-btn--primary">
+                    Ajouter une intervention
+                </a>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

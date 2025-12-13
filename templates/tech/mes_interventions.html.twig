@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des interventions{% endblock %}
+
+{% block body %}
+<div class="cc-app">
+    {% include 'tech/_header.html.twig' %}
+
+    <main class="cc-main">
+        <h1 class="cc-page-title">Gestion des interventions</h1>
+
+        {# Ici readonly = false → boutons d’action visibles pour le gérant #}
+        {% include 'tech/_carte_intervention.html.twig' with { readonly: readonly } %}
+
+        <div class="cc-footer-actions">
+            {% if is_granted('ROLE_GERANT') %}
+                <a href="#" class="cc-btn cc-btn--primary">
+                    Ajouter une intervention
+                </a>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

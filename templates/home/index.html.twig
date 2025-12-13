@@ -1,7 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil{% endblock %}
+{% block title %}Accueil CashCash{% endblock %}
 
 {% block body %}
-    <h1 style="color: red;">Bienvenue sur CashCash !</h1>
+<div class="cc-home">
+    <div class="cc-home-card">
+        <img src="{{ asset('images/logocashcash.png') }}" alt="CashCash" class="cc-logo-home">
+
+        <h1 class="cc-home-title">CashCash</h1>
+        <p class="cc-home-subtitle">Votre terminal, toujours opérationnel.</p>
+
+        <div class="cc-home-actions">
+            <a href="{{ path('tech_home') }}" class="cc-btn cc-btn--primary">
+                Espace technicien
+            </a>
+            <a href="{{ path('app_login') }}" class="cc-btn cc-btn--secondary">
+                Connexion / Inscription
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}
