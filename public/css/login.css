@@ -1,0 +1,86 @@
+/* Supprime les marges du body */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+}
+
+/* Wrapper qui centre tout */
+.login-wrapper {
+    height: 100vh;                   /* pleine hauteur écran */
+    display: flex;                   /* flexbox */
+    justify-content: center;         /* centre horizontalement */
+    align-items: center;             /* centre verticalement */
+}
+
+/* La fenêtre modal */
+.login-form {
+    width: 350px;
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Titre */
+.login-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Labels */
+.login-form label {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+/* Inputs */
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Checkbox */
+.remember-me {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.remember-me label {
+    margin-left: 8px;
+}
+
+/* Bouton */
+.login-form button {
+    margin-top: 20px;
+    padding: 12px;
+    background: #0066ff;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.login-form button:hover {
+    background: #0050cc;
+}
+
+/* Messages d’erreur */
+.alert {
+    padding: 10px;
+    background: #ffdddd;
+    color: #a30000;
+    margin-bottom: 15px;
+    border-radius: 6px;
+}

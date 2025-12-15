@@ -1,12 +1,42 @@
+{# templates/login.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Connexion{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+{% endblock %}
+
 {% block body %}
-<div class="cc-app">
-    <main class="cc-main">
-        <h1 class="cc-page-title">Connexion</h1>
-        <p>Formulaire de connexion à ajouter ici plus tard.</p>
-    </main>
+<div class="modal-backdrop">
+<div class="login-wrapper">
+    <form method="post" action="{{ path('app_login') }}" class="login-form" novalidate>
+        <h2>Se connecter</h2>
+
+        {# Afficher l'erreur d'authentification si elle existe #}
+        {% if error %}
+            <div class="alert alert-danger">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <label for="username">Email</label>
+        <input id="username" type="text" name="_username" value="{{ last_username }}" required autofocus>
+
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password" name="_password" required>
+
+        <div class="remember-me">
+            <input type="checkbox" id="remember_me" name="_remember_me" value="on">
+            <label for="remember_me">Se souvenir de moi</label>
+        </div>
+
+        {# CSRF token attendu par l'authenticator standard #}
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <button type="submit">Se connecter</button>
+    </form>
+</div>
 </div>
 {% endblock %}
