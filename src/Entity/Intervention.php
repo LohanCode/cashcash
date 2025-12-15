@@ -29,10 +29,10 @@ class Intervention
     #[ORM\JoinColumn(nullable: false)]
     private ?Client $client = null;
 
-    // 2. Relation ManyToOne avec Employe (le Technicien affecté)
-    #[ORM\ManyToOne(inversedBy: 'interventionsAffectees')]
+    // 2. Relation ManyToOne avec Utilisateur (le Technicien affecté)
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class, inversedBy: 'interventionsAffectees')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Employe $technicien = null; // Nommé 'technicien' mais pointe vers l'entité Employe
+    private ?Utilisateur $technicien = null;
 
     // 3. Relation OneToMany avec Controler (la table qui porte les détails du contrôle)
     #[ORM\OneToMany(mappedBy: 'intervention', targetEntity: Controler::class)]
@@ -91,12 +91,12 @@ class Intervention
         return $this;
     }
 
-    public function getTechnicien(): ?Employe
+    public function getTechnicien(): ?Utilisateur
     {
         return $this->technicien;
     }
 
-    public function setTechnicien(?Employe $technicien): static
+    public function setTechnicien(?Utilisateur $technicien): static
     {
         $this->technicien = $technicien;
 
