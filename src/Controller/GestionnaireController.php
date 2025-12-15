@@ -88,10 +88,10 @@ class GestionnaireController extends AbstractController
         ]);
     }
 
-    #[Route('/gestionnaire/statistiques-dev', name: 'app_gerant_statistiques')]
+    #[Route('/gerant/statistique', name: 'app_gerant_statistiques')]
     public function statistiques(): Response
     {
-        return $this->render('gestionnaire/statistiques.html.twig', [
+        return $this->render('gerant/statistiques.html.twig', [
             'stats' => [],
         ]);
     }
