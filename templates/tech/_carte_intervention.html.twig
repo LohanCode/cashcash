@@ -1,0 +1,64 @@
+{# valeur par défaut au cas où readonly n'est pas passé depuis le contrôleur #}
+{% set readonly = readonly ?? false %}
+
+<section class="cc-board">
+    <header class="cc-board-header">
+        <div class="cc-field-group">
+            <label>Nom de l'intervention</label>
+            <input type="text" class="cc-input" placeholder="Ex : Remplacement TPE">
+        </div>
+
+        <div class="cc-field-group">
+            <label>Gravité</label>
+            <select class="cc-input">
+                <option>Faible</option>
+                <option>Moyenne</option>
+                <option>Critique</option>
+            </select>
+        </div>
+
+        <div class="cc-field-group">
+            <label>Date incident</label>
+            <input type="date" class="cc-input">
+        </div>
+
+        <div class="cc-field-group">
+            <label>Ville</label>
+            <input type="text" class="cc-input" placeholder="Lille">
+        </div>
+    </header>
+
+    <div class="cc-board-body">
+        <div class="cc-card">
+            <h2 class="cc-card-title">Infos du client</h2>
+            <textarea class="cc-textarea" placeholder="Détails de l'incident, contexte, matériel concerné..."></textarea>
+
+            <div class="cc-row">
+                <div class="cc-field-group">
+                    <label>Statut</label>
+                    <select class="cc-input">
+                        <option>Ouverte</option>
+                        <option>En cours</option>
+                        <option>Résolue</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="cc-actions">
+                <button class="cc-btn cc-btn--secondary">Détails</button>
+
+                <div class="cc-actions-right">
+                    {# Bouton de validation visible pour TECH et GÉRANT si pas en lecture seule #}
+                    {% if not readonly and (is_granted('ROLE_TECH') or is_granted('ROLE_GERANT')) %}
+                        <button class="cc-icon-btn cc-icon-btn--ok">✔</button>
+                    {% endif %}
+
+                    {# Bouton de suppression / affectation visible uniquement pour le gérant et si pas readonly #}
+                    {% if not readonly and is_granted('ROLE_GERANT') %}
+                        <button class="cc-icon-btn cc-icon-btn--ko">✖</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

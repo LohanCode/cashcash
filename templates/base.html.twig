@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
+<<<<<<< HEAD
         <title>{% block title %}CASHCASH Gestionnaire{% endblock %}</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         {% block stylesheets %}
@@ -122,5 +123,12 @@
         {% block javascripts %}
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         {% endblock %}
+=======
+        <title>{% block title %}CashCash{% endblock %}</title>
+        <link rel="stylesheet" href="{{ asset('styles/tech.css') }}">
+    </head>
+    <body class="cc-body">
+        {% block body %}{% endblock %}
+>>>>>>> 92ccd186012cd8c8a72cdab441359542fab06fa8
     </body>
 </html>
