@@ -1,110 +1,117 @@
-<<<<<<< HEAD
-/* Fond général */
+:root {
+    --cc-blue-navy: #0f1f3a;      /* Bleu nuit (principal) */
+    --cc-black: #000000;          /* Noir (texte) */
+    --cc-grey-medium: #969eaa;    /* Gris moyen */
+    --cc-grey-light: #f3f5f8;     /* Gris clair (fond) */
+    --cc-white: #ffffff;          /* Blanc (surface) */
+    --cc-accent-red: #e5534b;     /* Accent pour les titres/boutons */
+    --cc-radius: 6px;
+    --cc-shadow-soft: 0 4px 12px rgba(15, 31, 58, 0.15);
+    --cc-font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
 body {
-    background: #f5f6fa;
-=======
-/* Supprime les marges du body */
-body {
->>>>>>> 92ccd186012cd8c8a72cdab441359542fab06fa8
+    background: var(--cc-grey-light);
+    font-family: var(--cc-font-main);
+    height: 100vh;
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
-}
-
-<<<<<<< HEAD
-/* Fond assombri façon modal plein écran */
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.35);
-    z-index: 1000;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    color: var(--cc-black);
 }
 
-/* La fenêtre de login */
-=======
-/* Wrapper qui centre tout */
->>>>>>> 92ccd186012cd8c8a72cdab441359542fab06fa8
-.login-wrapper {
-    height: 100vh;                   /* pleine hauteur écran */
-    display: flex;                   /* flexbox */
-    justify-content: center;         /* centre horizontalement */
-    align-items: center;             /* centre verticalement */
+.login-container {
+    background: var(--cc-white);
+    padding: 2.5rem;
+    border-radius: var(--cc-radius);
+    box-shadow: var(--cc-shadow-soft);
+    width: 100%;
+    max-width: 400px;
 }
 
-/* La fenêtre modal */
-.login-form {
-    width: 350px;
-    padding: 25px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    display: flex;
-    flex-direction: column;
-}
-
-/* Titre */
-.login-form h2 {
+.login-container h2 {
+    color: var(--cc-blue-navy);
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
     font-weight: 600;
 }
 
-/* Labels */
-.login-form label {
-    margin-top: 10px;
-    margin-bottom: 5px;
-    font-size: 14px;
+.form-label {
+    color: var(--cc-blue-navy);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
 }
 
-/* Inputs */
-.login-form input[type="text"],
-.login-form input[type="password"] {
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+.form-control {
     width: 100%;
-    box-sizing: border-box;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d3e2;
+    border-radius: var(--cc-radius);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out;
 }
 
-/* Checkbox */
-.remember-me {
-    margin-top: 15px;
-    display: flex;
-    align-items: center;
+.form-control:focus {
+    border-color: var(--cc-blue-navy);
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(15, 31, 58, 0.1);
 }
 
-.remember-me label {
-    margin-left: 8px;
-}
-
-/* Bouton */
-.login-form button {
-    margin-top: 20px;
-    padding: 12px;
-    background: #0066ff;
-    border: none;
+.btn-primary {
+    background-color: var(--cc-accent-red);
     color: white;
-    border-radius: 8px;
-    font-size: 16px;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--cc-radius);
+    font-weight: 500;
+    font-size: 1rem;
     cursor: pointer;
-    transition: 0.2s;
+    width: 100%;
+    transition: background-color 0.2s;
 }
 
-.login-form button:hover {
-    background: #0050cc;
+.btn-primary:hover {
+    background-color: #d04a43;
 }
 
-/* Messages d’erreur */
 .alert {
-    padding: 10px;
-    background: #ffdddd;
-    color: #a30000;
-    margin-bottom: 15px;
-    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: var(--cc-radius);
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.form-check {
+    margin: 1rem 0;
+}
+
+.form-check-input:checked {
+    background-color: var(--cc-accent-red);
+    border-color: var(--cc-accent-red);
+}
+
+.form-check-label {
+    margin-left: 0.5rem;
+    color: var(--cc-blue-navy);
+}
+
+/* Style pour le lien mot de passe oublié */
+.forgot-password {
+    text-align: right;
+    margin: 0.5rem 0 1.5rem;
+}
+
+.forgot-password a {
+    color: var(--cc-blue-navy);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
 }
