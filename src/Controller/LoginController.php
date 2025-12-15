@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 
 namespace App\Controller;
@@ -11,44 +10,22 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class LoginController extends AbstractController
 {
     #[Route('/login', name: 'app_login')]
-    public function index(AuthenticationUtils $authenticationUtils): Response
-    {
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        return $this->render('login.html.twig', [
-            'last_username' => $lastUsername,
-            'error' => $error,
-        ]);
-    }
-}
-
-=======
-<?php
-
-namespace App\Controller;
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-
-class LoginController extends AbstractController
+public function index(AuthenticationUtils $authenticationUtils, Request $request): Response
 {
-    #[Route('/login', name: 'app_login')]
-    public function index(AuthenticationUtils $authenticationUtils): Response
-    {
-        // get the login error if there is one
-        $error = $authenticationUtils->getLastAuthenticationError();
-
-        // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        return $this->render('login.html.twig', [
-            'last_username' => $lastUsername,
-            'error' => $error,
-        ]);
+    // Si l'utilisateur est déjà connecté, on le déconnecte
+    if ($this->getUser() && $request->query->get('action') === 'logout') {
+        $this->get('security.token_storage')->setToken(null);
+        $request->getSession()->invalidate();
+        return $this->redirectToRoute('app_login');
     }
-}
 
->>>>>>> 92ccd186012cd8c8a72cdab441359542fab06fa8
+    // Gestion de la connexion normale
+    $error = $authenticationUtils->getLastAuthenticationError();
+    $lastUsername = $authenticationUtils->getLastUsername();
+
+    return $this->render('login.html.twig', [
+        'last_username' => $lastUsername,
+        'error' => $error,
+    ]);
+}
+}
