@@ -1,12 +1,92 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tableau de bord - Statistiques{% endblock %}
+{% block title %}Statistiques - Gestionnaire{% endblock %}
 
 {% block body %}
-    <h1>Statistiques</h1>
+    <div class="dashboard-header">
+        <h1>Statistiques</h1>
+        <p>Vue d'ensemble des activités et performances de votre équipe.</p>
+    </div>
+
+    <div class="stats-overview">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ total_interventions }}</span>
+                <span class="stat-label">Interventions</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-hard-hat"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ total_techniciens }}</span>
+                <span class="stat-label">Techniciens</span>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ total_clients }}</span>
+                <span class="stat-label">Clients</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid" style="margin-top: 2rem;">
+        <div class="dashboard-card">
+            <i class="fas fa-users"></i>
+            <h2>Répartition par technicien</h2>
+            <div class="tech-list">
+                {% for tech in techniciens %}
+                    <div class="tech-item">
+                        <span class="tech-name">{{ tech.prenom }} {{ tech.nom }}</span>
+                        <span class="tech-count">
+                            {% set count = 0 %}
+                            {% for intervention in interventions %}
+                                {% if intervention.technicien and intervention.technicien.id == tech.id %}
+                                    {% set count = count + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            {{ count }} intervention{{ count > 1 ? 's' : '' }}
+                        </span>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Aucun technicien enregistré.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <i class="fas fa-chart-pie"></i>
+            <h2>Interventions récentes</h2>
+            <div class="intervention-list">
+                {% for intervention in interventions|slice(0, 5) %}
+                    <div class="intervention-item">
+                        <span class="intervention-client">
+                            {{ intervention.client ? intervention.client.raisSociale : 'Non assigné' }}
+                        </span>
+                        <span class="intervention-date">
+                            {{ intervention.dateVisite ? intervention.dateVisite|date('d/m/Y') : 'Date non définie' }}
+                        </span>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Aucune intervention enregistrée.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{{ path('app_gerant_accueil') }}" class="btn-dashboard">
+            <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+        </a>
+    </div>
 {% endblock %}
-        ]);
-    }
-    
-    // ... (Le reste du contrôleur) ...
-}

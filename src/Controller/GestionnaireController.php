@@ -119,10 +119,22 @@ if ($request->isMethod('POST')) {
     }
 
     #[Route('/gerant/statistique', name: 'app_gerant_statistiques')]
-    public function statistiques(): Response
+    public function statistiques(
+        InterventionRepository $interventionRepository,
+        UtilisateurRepository $utilisateurRepository,
+        ClientRepository $clientRepository
+    ): Response
     {
-        return $this->render('gerant/statistiques.html.twig', [
-            'stats' => [],
+        $interventions = $interventionRepository->findAll();
+        $techniciens = $utilisateurRepository->findBy(['type_utilisateur' => 'technicien']);
+        $clients = $clientRepository->findAll();
+        
+        return $this->render('gestionnaire/statistiques.html.twig', [
+            'total_interventions' => count($interventions),
+            'total_techniciens' => count($techniciens),
+            'total_clients' => count($clients),
+            'interventions' => $interventions,
+            'techniciens' => $techniciens,
         ]);
     }
 }
