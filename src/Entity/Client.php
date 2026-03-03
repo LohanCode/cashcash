@@ -77,12 +77,99 @@ class Client
         return $this->numClient;
     }
 
+    public function setNumClient(string $numClient): static
+    {
+        $this->numClient = $numClient;
+        return $this;
+    }
+
     public function getRaisSociale(): ?string
     {
         return $this->raisSociale;
     }
 
-    // ... [Getters/Setters pour les champs de base] ...
+    public function setRaisSociale(?string $raisSociale): static
+    {
+        $this->raisSociale = $raisSociale;
+        return $this;
+    }
+
+    public function getSiren(): ?string
+    {
+        return $this->siren;
+    }
+
+    public function setSiren(?string $siren): static
+    {
+        $this->siren = $siren;
+        return $this;
+    }
+
+    public function getCodeApe(): ?int
+    {
+        return $this->codeApe;
+    }
+
+    public function setCodeApe(?int $codeApe): static
+    {
+        $this->codeApe = $codeApe;
+        return $this;
+    }
+
+    public function getAdresseClient(): ?string
+    {
+        return $this->adresseClient;
+    }
+
+    public function setAdresseClient(?string $adresseClient): static
+    {
+        $this->adresseClient = $adresseClient;
+        return $this;
+    }
+
+    public function getTelephoneClient(): ?int
+    {
+        return $this->telephoneClient;
+    }
+
+    public function setTelephoneClient(?int $telephoneClient): static
+    {
+        $this->telephoneClient = $telephoneClient;
+        return $this;
+    }
+
+    public function getEmailClient(): ?string
+    {
+        return $this->emailClient;
+    }
+
+    public function setEmailClient(?string $emailClient): static
+    {
+        $this->emailClient = $emailClient;
+        return $this;
+    }
+
+    public function getDureeDeplacement(): ?string
+    {
+        return $this->dureeDeplacement;
+    }
+
+    public function setDureeDeplacement(?string $dureeDeplacement): static
+    {
+        $this->dureeDeplacement = $dureeDeplacement;
+        return $this;
+    }
+
+    public function getDistanceKm(): ?string
+    {
+        return $this->distanceKm;
+    }
+
+    public function setDistanceKm(?string $distanceKm): static
+    {
+        $this->distanceKm = $distanceKm;
+        return $this;
+    }
 
     // -----------------------------------------------------------
     // Getters/Setters pour les Relations

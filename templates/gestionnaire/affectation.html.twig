@@ -47,7 +47,7 @@
                         </td>
 
                         <td>
-                            {{ intervention.technicien ? (intervention.technicien.nomEmploye ~ ' ' ~ intervention.technicien.prenomEmploye) : 'Non affectée' }}
+                            {{ intervention.technicien ? (intervention.technicien.nom ~ ' ' ~ intervention.technicien.prenom) : 'Non affectée' }}
                         </td>
                         <td>
                                 <div class="d-flex gap-2">
@@ -56,7 +56,7 @@
                                     {% for technicien in techniciens %}
 
                                         <option value="{{ technicien.id }}">
-                                            {{ technicien.matricule }} - {{ technicien.nomEmploye }} {{ technicien.prenomEmploye }}
+                                            {{ technicien.nom }} {{ technicien.prenom }}
                                         </option>
                                     {% endfor %}
                                 </select>
