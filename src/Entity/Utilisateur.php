@@ -25,6 +25,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 50)]
     private string $type_utilisateur = self::TYPE_EMPLOYE;
 
+    #[ORM\Column(length: 20, unique: true, nullable: true)]
+    private ?string $matricule = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $nom = null;
 
@@ -60,6 +63,17 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getMatricule(): ?string
+    {
+        return $this->matricule;
+    }
+
+    public function setMatricule(?string $matricule): static
+    {
+        $this->matricule = $matricule;
+        return $this;
     }
 
     public function getNom(): ?string

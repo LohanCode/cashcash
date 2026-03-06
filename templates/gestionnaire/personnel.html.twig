@@ -63,7 +63,7 @@
         <table class="personnel-table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Matricule</th>
                     <th>Nom</th>
                     <th>Prénom</th>
                     <th>Email</th>
@@ -75,7 +75,7 @@
             <tbody>
                 {% for utilisateur in utilisateurs %}
                 <tr>
-                    <td>{{ utilisateur.id }}</td>
+                    <td><strong>{{ utilisateur.matricule ?? 'Non défini' }}</strong></td>
                     <td>{{ utilisateur.nom }}</td>
                     <td>{{ utilisateur.prenom }}</td>
                     <td>{{ utilisateur.email }}</td>
@@ -95,7 +95,7 @@
                     </td>
                     <td>{{ utilisateur.agence ? utilisateur.agence.nomAgence : 'N/A' }}</td>
                     <td class="actions-cell">
-                        <button class="btn-icon btn-edit" onclick="openEditModal({{ utilisateur.id }}, '{{ utilisateur.nom }}', '{{ utilisateur.prenom }}', '{{ utilisateur.email }}', '{{ utilisateur.typeUtilisateur }}', {{ utilisateur.agence ? utilisateur.agence.id : 'null' }})" title="Modifier">
+                        <button class="btn-icon btn-edit" onclick="openEditModal({{ utilisateur.id }}, '{{ utilisateur.matricule }}', '{{ utilisateur.nom }}', '{{ utilisateur.prenom }}', '{{ utilisateur.email }}', '{{ utilisateur.typeUtilisateur }}', {{ utilisateur.agence ? utilisateur.agence.id : 'null' }})" title="Modifier">
                             <i class="fas fa-edit"></i>
                         </button>
                         <form action="{{ path('app_gerant_personnel_supprimer', {id: utilisateur.id}) }}" method="POST" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
@@ -127,6 +127,10 @@
         </div>
         <form action="{{ path('app_gerant_personnel_nouveau') }}" method="POST">
             <div class="modal-body">
+                <div class="form-group">
+                    <label for="matricule">Matricule *</label>
+                    <input type="text" id="matricule" name="matricule" required placeholder="Ex: TECH001, GEST002">
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="nom">Nom *</label>
@@ -186,6 +190,10 @@
         </div>
         <form id="formModifier" action="" method="POST">
             <div class="modal-body">
+                <div class="form-group">
+                    <label for="edit_matricule">Matricule *</label>
+                    <input type="text" id="edit_matricule" name="matricule" required>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="edit_nom">Nom *</label>
@@ -243,8 +251,9 @@ function closeModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
 }
 
-function openEditModal(id, nom, prenom, email, type, agenceId) {
+function openEditModal(id, matricule, nom, prenom, email, type, agenceId) {
     document.getElementById('formModifier').action = '/gerant/personnel/' + id + '/modifier';
+    document.getElementById('edit_matricule').value = matricule;
     document.getElementById('edit_nom').value = nom;
     document.getElementById('edit_prenom').value = prenom;
     document.getElementById('edit_email').value = email;

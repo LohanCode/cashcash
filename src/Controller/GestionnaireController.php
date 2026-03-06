@@ -173,6 +173,7 @@ if ($request->isMethod('POST')) {
         AgenceRepository $agenceRepository,
         UserPasswordHasherInterface $passwordHasher
     ): Response {
+        $matricule = $request->request->get('matricule');
         $nom = $request->request->get('nom');
         $prenom = $request->request->get('prenom');
         $email = $request->request->get('email');
@@ -180,7 +181,7 @@ if ($request->isMethod('POST')) {
         $type = $request->request->get('type_utilisateur');
         $agenceId = $request->request->get('agence_id');
         
-        if (!$nom || !$prenom || !$email || !$password || !$type || !$agenceId) {
+        if (!$matricule || !$nom || !$prenom || !$email || !$password || !$type || !$agenceId) {
             $this->addFlash('danger', 'Tous les champs sont obligatoires.');
             return $this->redirectToRoute('app_gerant_personnel');
         }
@@ -192,6 +193,7 @@ if ($request->isMethod('POST')) {
         }
         
         $utilisateur = new Utilisateur();
+        $utilisateur->setMatricule($matricule);
         $utilisateur->setNom($nom);
         $utilisateur->setPrenom($prenom);
         $utilisateur->setEmail($email);
@@ -240,6 +242,7 @@ if ($request->isMethod('POST')) {
             return $this->redirectToRoute('app_gerant_personnel');
         }
         
+        $matricule = $request->request->get('matricule');
         $nom = $request->request->get('nom');
         $prenom = $request->request->get('prenom');
         $email = $request->request->get('email');
@@ -247,6 +250,7 @@ if ($request->isMethod('POST')) {
         $type = $request->request->get('type_utilisateur');
         $agenceId = $request->request->get('agence_id');
         
+        if ($matricule) $utilisateur->setMatricule($matricule);
         if ($nom) $utilisateur->setNom($nom);
         if ($prenom) $utilisateur->setPrenom($prenom);
         if ($email) $utilisateur->setEmail($email);
