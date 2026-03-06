@@ -129,7 +129,7 @@ body {
 }
 
 .dashboard-header h1 {
-    color: var(--cc-charcoal);
+    color: var(--cc-accent);
     margin-bottom: 0.75rem;
     font-weight: 600;
     font-size: 1.8rem;
@@ -226,6 +226,16 @@ body {
 .btn-dashboard:hover {
     background: var(--cc-accent-dark);
     color: var(--cc-white);
+}
+
+/* Bouton rouge explicite */
+.btn-rouge {
+    background: #d63031 !important;
+    color: white !important;
+}
+
+.btn-rouge:hover {
+    background: #c0392b !important;
 }
 
 .btn-dashboard[style*="background-color: #6c757d"] {

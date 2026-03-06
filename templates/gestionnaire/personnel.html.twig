@@ -1,0 +1,657 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion du Personnel - CASHCASH{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="personnel-container">
+    <div class="page-header">
+        <div class="header-left">
+            <a href="{{ path('app_gerant_accueil') }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+            <h1><i class="fas fa-users"></i> Gestion du Personnel</h1>
+        </div>
+        <button class="btn-primary" onclick="openModal('modalNouveau')">
+            <i class="fas fa-plus"></i> Nouvel utilisateur
+        </button>
+    </div>
+
+    {# Messages flash #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">
+                <i class="fas fa-{{ label == 'success' ? 'check-circle' : (label == 'danger' ? 'exclamation-circle' : 'info-circle') }}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Filtres #}
+    <div class="filtres-section">
+        <span class="filtres-label">Filtrer par type :</span>
+        <div class="filtres-buttons">
+            <a href="{{ path('app_gerant_personnel', {type: 'tous'}) }}" 
+               class="btn-filtre {{ typeFiltre == 'tous' ? 'active' : '' }}">
+                Tous
+            </a>
+            <a href="{{ path('app_gerant_personnel', {type: 'technicien'}) }}" 
+               class="btn-filtre {{ typeFiltre == 'technicien' ? 'active' : '' }}">
+                <i class="fas fa-wrench"></i> Techniciens
+            </a>
+            <a href="{{ path('app_gerant_personnel', {type: 'employe'}) }}" 
+               class="btn-filtre {{ typeFiltre == 'employe' ? 'active' : '' }}">
+                <i class="fas fa-user"></i> Employés
+            </a>
+            <a href="{{ path('app_gerant_personnel', {type: 'gestionnaire'}) }}" 
+               class="btn-filtre {{ typeFiltre == 'gestionnaire' ? 'active' : '' }}">
+                <i class="fas fa-user-tie"></i> Gestionnaires
+            </a>
+            <a href="{{ path('app_gerant_personnel', {type: 'admin'}) }}" 
+               class="btn-filtre {{ typeFiltre == 'admin' ? 'active' : '' }}">
+                <i class="fas fa-user-shield"></i> Administrateurs
+            </a>
+        </div>
+    </div>
+
+    {# Tableau des utilisateurs #}
+    <div class="table-card">
+        <table class="personnel-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Email</th>
+                    <th>Type</th>
+                    <th>Agence</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for utilisateur in utilisateurs %}
+                <tr>
+                    <td>{{ utilisateur.id }}</td>
+                    <td>{{ utilisateur.nom }}</td>
+                    <td>{{ utilisateur.prenom }}</td>
+                    <td>{{ utilisateur.email }}</td>
+                    <td>
+                        <span class="badge badge-{{ utilisateur.typeUtilisateur }}">
+                            {% if utilisateur.typeUtilisateur == 'technicien' %}
+                                <i class="fas fa-wrench"></i>
+                            {% elseif utilisateur.typeUtilisateur == 'admin' %}
+                                <i class="fas fa-user-shield"></i>
+                            {% elseif utilisateur.typeUtilisateur == 'gestionnaire' %}
+                                <i class="fas fa-user-tie"></i>
+                            {% else %}
+                                <i class="fas fa-user"></i>
+                            {% endif %}
+                            {{ utilisateur.typeUtilisateur|capitalize }}
+                        </span>
+                    </td>
+                    <td>{{ utilisateur.agence ? utilisateur.agence.nomAgence : 'N/A' }}</td>
+                    <td class="actions-cell">
+                        <button class="btn-icon btn-edit" onclick="openEditModal({{ utilisateur.id }}, '{{ utilisateur.nom }}', '{{ utilisateur.prenom }}', '{{ utilisateur.email }}', '{{ utilisateur.typeUtilisateur }}', {{ utilisateur.agence ? utilisateur.agence.id : 'null' }})" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <form action="{{ path('app_gerant_personnel_supprimer', {id: utilisateur.id}) }}" method="POST" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+                            <button type="submit" class="btn-icon btn-delete" title="Supprimer">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="empty-message">
+                        <i class="fas fa-inbox"></i>
+                        <p>Aucun utilisateur trouvé</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# Modal Nouveau #}
+<div id="modalNouveau" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-plus"></i> Nouvel utilisateur</h2>
+            <button class="modal-close" onclick="closeModal('modalNouveau')">&times;</button>
+        </div>
+        <form action="{{ path('app_gerant_personnel_nouveau') }}" method="POST">
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nom">Nom *</label>
+                        <input type="text" id="nom" name="nom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prenom">Prénom *</label>
+                        <input type="text" id="prenom" name="prenom" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mot de passe *</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="type_utilisateur">Type *</label>
+                        <select id="type_utilisateur" name="type_utilisateur" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="employe">Employé</option>
+                            <option value="technicien">Technicien</option>
+                            <option value="gestionnaire">Gestionnaire</option>
+                            <option value="admin">Administrateur</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="agence_id">Agence *</label>
+                        <select id="agence_id" name="agence_id" required>
+                            <option value="">-- Sélectionner --</option>
+                            {% for agence in agences %}
+                                <option value="{{ agence.id }}">{{ agence.nomAgence }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('modalNouveau')">Annuler</button>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> Créer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Modal Modifier #}
+<div id="modalModifier" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-edit"></i> Modifier l'utilisateur</h2>
+            <button class="modal-close" onclick="closeModal('modalModifier')">&times;</button>
+        </div>
+        <form id="formModifier" action="" method="POST">
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit_nom">Nom *</label>
+                        <input type="text" id="edit_nom" name="nom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_prenom">Prénom *</label>
+                        <input type="text" id="edit_prenom" name="prenom" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit_email">Email *</label>
+                    <input type="email" id="edit_email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_password">Nouveau mot de passe</label>
+                    <input type="password" id="edit_password" name="password" minlength="6" placeholder="Laisser vide pour ne pas changer">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit_type">Type *</label>
+                        <select id="edit_type" name="type_utilisateur" required>
+                            <option value="employe">Employé</option>
+                            <option value="technicien">Technicien</option>
+                            <option value="gestionnaire">Gestionnaire</option>
+                            <option value="admin">Administrateur</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_agence">Agence *</label>
+                        <select id="edit_agence" name="agence_id" required>
+                            {% for agence in agences %}
+                                <option value="{{ agence.id }}">{{ agence.nomAgence }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeModal('modalModifier')">Annuler</button>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+}
+
+function openEditModal(id, nom, prenom, email, type, agenceId) {
+    document.getElementById('formModifier').action = '/gerant/personnel/' + id + '/modifier';
+    document.getElementById('edit_nom').value = nom;
+    document.getElementById('edit_prenom').value = prenom;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_type').value = type;
+    if (agenceId) {
+        document.getElementById('edit_agence').value = agenceId;
+    }
+    openModal('modalModifier');
+}
+
+// Fermer le modal si on clique en dehors
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('active');
+    }
+}
+</script>
+
+<style>
+/* Container */
+.personnel-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.page-header h1 {
+    color: var(--cc-charcoal, #2d3436);
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.btn-back {
+    color: var(--cc-slate, #636e72);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background: var(--cc-sand, #dfe6e9);
+}
+
+/* Alerts */
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* Filtres */
+.filtres-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.filtres-label {
+    font-weight: 500;
+    color: var(--cc-slate, #636e72);
+}
+
+.filtres-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-filtre {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--cc-slate, #636e72);
+    background: white;
+    border: 1px solid var(--cc-sand, #dfe6e9);
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.btn-filtre:hover {
+    background: var(--cc-sand, #dfe6e9);
+}
+
+.btn-filtre.active {
+    background: var(--cc-charcoal, #2d3436);
+    color: white;
+    border-color: var(--cc-charcoal, #2d3436);
+}
+
+/* Boutons principaux */
+.btn-primary {
+    background: var(--cc-accent, #d63031);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: var(--cc-sand, #dfe6e9);
+    color: var(--cc-charcoal, #2d3436);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #c8d6e5;
+}
+
+/* Table */
+.table-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.personnel-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.personnel-table th,
+.personnel-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--cc-sand, #dfe6e9);
+}
+
+.personnel-table th {
+    background: var(--cc-cream, #f5f6fa);
+    font-weight: 600;
+    color: var(--cc-charcoal, #2d3436);
+}
+
+.personnel-table tbody tr:hover {
+    background: var(--cc-cream, #f5f6fa);
+}
+
+.personnel-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-technicien {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.badge-admin {
+    background: #fce4ec;
+    color: #c62828;
+}
+
+.badge-employe {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-gestionnaire {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+/* Actions */
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-edit {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.btn-edit:hover {
+    background: #bbdefb;
+}
+
+.btn-delete {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.btn-delete:hover {
+    background: #ffcdd2;
+}
+
+/* Empty state */
+.empty-message {
+    text-align: center;
+    padding: 3rem !important;
+    color: var(--cc-slate, #636e72);
+}
+
+.empty-message i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--cc-sand, #dfe6e9);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--cc-charcoal, #2d3436);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--cc-slate, #636e72);
+    padding: 0;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: var(--cc-charcoal, #2d3436);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--cc-sand, #dfe6e9);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--cc-charcoal, #2d3436);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--cc-sand, #dfe6e9);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--cc-accent, #d63031);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .filtres-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .personnel-table {
+        font-size: 0.85rem;
+    }
+    
+    .personnel-table th,
+    .personnel-table td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+</style>
+{% endblock %}

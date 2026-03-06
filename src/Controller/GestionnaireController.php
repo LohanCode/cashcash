@@ -10,6 +10,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\InterventionRepository;
 use App\Repository\UtilisateurRepository;
 use App\Repository\ClientRepository;
+use App\Repository\AgenceRepository;
+use App\Entity\Utilisateur;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class GestionnaireController extends AbstractController
 {
@@ -136,5 +139,176 @@ if ($request->isMethod('POST')) {
             'interventions' => $interventions,
             'techniciens' => $techniciens,
         ]);
+    }
+
+    // ========== GESTION DU PERSONNEL ==========
+
+    #[Route('/gerant/personnel', name: 'app_gerant_personnel')]
+    public function personnel(
+        UtilisateurRepository $utilisateurRepository,
+        AgenceRepository $agenceRepository,
+        Request $request
+    ): Response {
+        $typeFiltre = $request->query->get('type', 'tous');
+        
+        if ($typeFiltre === 'tous') {
+            $utilisateurs = $utilisateurRepository->findAll();
+        } else {
+            $utilisateurs = $utilisateurRepository->findBy(['type_utilisateur' => $typeFiltre]);
+        }
+        
+        $agences = $agenceRepository->findAll();
+        
+        return $this->render('gestionnaire/personnel.html.twig', [
+            'utilisateurs' => $utilisateurs,
+            'agences' => $agences,
+            'typeFiltre' => $typeFiltre,
+        ]);
+    }
+
+    #[Route('/gerant/personnel/nouveau', name: 'app_gerant_personnel_nouveau', methods: ['POST'])]
+    public function personnelNouveau(
+        Request $request,
+        EntityManagerInterface $em,
+        AgenceRepository $agenceRepository,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response {
+        $nom = $request->request->get('nom');
+        $prenom = $request->request->get('prenom');
+        $email = $request->request->get('email');
+        $password = $request->request->get('password');
+        $type = $request->request->get('type_utilisateur');
+        $agenceId = $request->request->get('agence_id');
+        
+        if (!$nom || !$prenom || !$email || !$password || !$type || !$agenceId) {
+            $this->addFlash('danger', 'Tous les champs sont obligatoires.');
+            return $this->redirectToRoute('app_gerant_personnel');
+        }
+        
+        $agence = $agenceRepository->find($agenceId);
+        if (!$agence) {
+            $this->addFlash('danger', 'Agence introuvable.');
+            return $this->redirectToRoute('app_gerant_personnel');
+        }
+        
+        $utilisateur = new Utilisateur();
+        $utilisateur->setNom($nom);
+        $utilisateur->setPrenom($prenom);
+        $utilisateur->setEmail($email);
+        $utilisateur->setTypeUtilisateur($type);
+        $utilisateur->setAgence($agence);
+        
+        // Définir les rôles selon le type
+        $roles = ['ROLE_USER'];
+        if ($type === 'admin') {
+            $roles[] = 'ROLE_ADMIN';
+        } elseif ($type === 'technicien') {
+            $roles[] = 'ROLE_TECH';
+        } elseif ($type === 'gestionnaire') {
+            $roles[] = 'ROLE_GERANT';
+        }
+        $utilisateur->setRoles($roles);
+        
+        // Hasher le mot de passe
+        $hashedPassword = $passwordHasher->hashPassword($utilisateur, $password);
+        $utilisateur->setPassword($hashedPassword);
+        
+        try {
+            $em->persist($utilisateur);
+            $em->flush();
+            $this->addFlash('success', 'Utilisateur créé avec succès.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Erreur lors de la création : email déjà utilisé ?');
+        }
+        
+        return $this->redirectToRoute('app_gerant_personnel');
+    }
+
+    #[Route('/gerant/personnel/{id}/modifier', name: 'app_gerant_personnel_modifier', methods: ['POST'])]
+    public function personnelModifier(
+        int $id,
+        Request $request,
+        EntityManagerInterface $em,
+        UtilisateurRepository $utilisateurRepository,
+        AgenceRepository $agenceRepository,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response {
+        $utilisateur = $utilisateurRepository->find($id);
+        
+        if (!$utilisateur) {
+            $this->addFlash('danger', 'Utilisateur introuvable.');
+            return $this->redirectToRoute('app_gerant_personnel');
+        }
+        
+        $nom = $request->request->get('nom');
+        $prenom = $request->request->get('prenom');
+        $email = $request->request->get('email');
+        $password = $request->request->get('password');
+        $type = $request->request->get('type_utilisateur');
+        $agenceId = $request->request->get('agence_id');
+        
+        if ($nom) $utilisateur->setNom($nom);
+        if ($prenom) $utilisateur->setPrenom($prenom);
+        if ($email) $utilisateur->setEmail($email);
+        
+        if ($type) {
+            $utilisateur->setTypeUtilisateur($type);
+            // Mettre à jour les rôles
+            $roles = ['ROLE_USER'];
+            if ($type === 'admin') {
+                $roles[] = 'ROLE_ADMIN';
+            } elseif ($type === 'technicien') {
+                $roles[] = 'ROLE_TECH';
+            } elseif ($type === 'gestionnaire') {
+                $roles[] = 'ROLE_GERANT';
+            }
+            $utilisateur->setRoles($roles);
+        }
+        
+        if ($agenceId) {
+            $agence = $agenceRepository->find($agenceId);
+            if ($agence) {
+                $utilisateur->setAgence($agence);
+            }
+        }
+        
+        // Seulement si un nouveau mot de passe est fourni
+        if ($password && strlen($password) > 0) {
+            $hashedPassword = $passwordHasher->hashPassword($utilisateur, $password);
+            $utilisateur->setPassword($hashedPassword);
+        }
+        
+        try {
+            $em->flush();
+            $this->addFlash('success', 'Utilisateur modifié avec succès.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Erreur lors de la modification.');
+        }
+        
+        return $this->redirectToRoute('app_gerant_personnel');
+    }
+
+    #[Route('/gerant/personnel/{id}/supprimer', name: 'app_gerant_personnel_supprimer', methods: ['POST'])]
+    public function personnelSupprimer(
+        int $id,
+        EntityManagerInterface $em,
+        UtilisateurRepository $utilisateurRepository
+    ): Response {
+        $utilisateur = $utilisateurRepository->find($id);
+        
+        if (!$utilisateur) {
+            $this->addFlash('danger', 'Utilisateur introuvable.');
+            return $this->redirectToRoute('app_gerant_personnel');
+        }
+        
+        try {
+            $em->remove($utilisateur);
+            $em->flush();
+            $this->addFlash('success', 'Utilisateur supprimé avec succès.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Impossible de supprimer cet utilisateur (interventions liées ?).');
+        }
+        
+        return $this->redirectToRoute('app_gerant_personnel');
     }
 }
