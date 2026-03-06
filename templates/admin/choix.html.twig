@@ -1,0 +1,185 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Choix de l'interface - Admin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="choix-container">
+    <div class="choix-header">
+        <h1><i class="fas fa-user-shield"></i> Espace Administrateur</h1>
+        <p>Bienvenue {{ app.user.prenom }} {{ app.user.nom }}. Choisissez l'interface à utiliser.</p>
+    </div>
+
+    <div class="choix-grid">
+        <a href="{{ path('app_gerant_accueil') }}" class="choix-card">
+            <div class="choix-icon gerant">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <h2>Interface Gestionnaire</h2>
+            <p>Gérez les affectations, consultez les statistiques et administrez le personnel.</p>
+            <span class="choix-btn">
+                <i class="fas fa-arrow-right"></i> Accéder
+            </span>
+        </a>
+
+        <a href="{{ path('tech_home') }}" class="choix-card">
+            <div class="choix-icon tech">
+                <i class="fas fa-wrench"></i>
+            </div>
+            <h2>Interface Technicien</h2>
+            <p>Consultez les interventions, l'historique et effectuez des recherches client.</p>
+            <span class="choix-btn">
+                <i class="fas fa-arrow-right"></i> Accéder
+            </span>
+        </a>
+    </div>
+
+    <div class="choix-footer">
+        <a href="{{ path('app_logout') }}" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Se déconnecter
+        </a>
+    </div>
+</div>
+
+<style>
+.choix-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.choix-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.choix-header h1 {
+    color: var(--cc-charcoal, #2d3436);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.choix-header h1 i {
+    color: var(--cc-accent, #d63031);
+    margin-right: 0.5rem;
+}
+
+.choix-header p {
+    color: var(--cc-slate, #636e72);
+    font-size: 1.1rem;
+}
+
+.choix-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+.choix-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.choix-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    border-color: var(--cc-accent, #d63031);
+}
+
+.choix-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+}
+
+.choix-icon.gerant {
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    color: #e65100;
+}
+
+.choix-icon.tech {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1565c0;
+}
+
+.choix-card h2 {
+    color: var(--cc-charcoal, #2d3436);
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
+}
+
+.choix-card p {
+    color: var(--cc-slate, #636e72);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.choix-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--cc-charcoal, #2d3436);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.choix-card:hover .choix-btn {
+    background: var(--cc-accent, #d63031);
+}
+
+.choix-footer {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--cc-slate, #636e72);
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.btn-logout:hover {
+    background: #ffebee;
+    color: #c62828;
+}
+
+@media (max-width: 768px) {
+    .choix-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .choix-container {
+        padding: 1rem;
+    }
+}
+</style>
+{% endblock %}
