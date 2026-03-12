@@ -1,13 +1,27 @@
 :root {
-    --cc-blue-navy: #0f1f3a;      /* Bleu nuit principal */
-    --cc-black: #111111;          /* Texte */
-    --cc-grey-medium: #9ba2b1;    /* Gris moyen */
-    --cc-grey-light: #f3f4f6;     /* Gris clair */
-    --cc-white: #ffffff;          /* Blanc */
-    --cc-accent: #1f6f8b;         /* Bleu/vert doux, pas de rouge */
-    --cc-radius: 10px;
-    --cc-shadow-soft: 0 18px 45px rgba(15, 31, 58, 0.25);
-    --cc-font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    /* Palette identique à gerant.css */
+    --cc-charcoal: #2d3436;
+    --cc-dark: #1e272e;
+    --cc-slate: #636e72;
+    --cc-stone: #b2bec3;
+    --cc-sand: #dfe6e9;
+    --cc-cream: #f5f6fa;
+    --cc-white: #ffffff;
+    --cc-accent: #d63031;
+    --cc-accent-dark: #b71c1c;
+    --cc-success: #27ae60;
+    --cc-radius: 8px;
+    --cc-radius-sm: 6px;
+    --cc-shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --cc-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --cc-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --cc-font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    
+    /* Anciennes variables pour compatibilité */
+    --cc-blue-navy: var(--cc-charcoal);
+    --cc-black: var(--cc-charcoal);
+    --cc-grey-medium: var(--cc-slate);
+    --cc-grey-light: var(--cc-cream);
 }
 
 /* Fond “marbre” pour tout le site */
@@ -90,14 +104,15 @@
 }
 
 .cc-btn--primary {
-    background: linear-gradient(135deg, var(--cc-blue-navy), #1a2f57);
+    background: var(--cc-accent);
     color: var(--cc-white);
-    box-shadow: 0 10px 25px rgba(15, 31, 58, 0.35);
+    box-shadow: 0 4px 12px rgba(214, 48, 49, 0.3);
 }
 
 .cc-btn--primary:hover {
+    background: var(--cc-accent-dark);
     transform: translateY(-1px);
-    box-shadow: 0 14px 32px rgba(15, 31, 58, 0.45);
+    box-shadow: 0 6px 16px rgba(214, 48, 49, 0.4);
 }
 
 .cc-btn--secondary {
@@ -124,9 +139,9 @@
     justify-content: space-between;
     gap: 24px;
     padding: 12px 32px;
-    background: linear-gradient(120deg, #0f1f3a, #1f2b4f);
+    background: var(--cc-charcoal);
     color: var(--cc-white);
-    box-shadow: 0 10px 25px rgba(15, 31, 58, 0.45);
+    box-shadow: var(--cc-shadow-md);
 }
 
 .cc-logo {

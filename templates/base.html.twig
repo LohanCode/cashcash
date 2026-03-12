@@ -30,7 +30,7 @@
             /* ... (le reste de votre CSS actuel) ... */
         </style>
 
-        {% if app.request.get('_route') != 'app_login' %}
+        {% if app.request.get('_route') != 'app_login' and app.request.get('_route') != 'app_admin_choix' %}
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">
@@ -41,18 +41,56 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_gerant_accueil') }}">
-                                <i class="fas fa-home me-1"></i> Tableau de bord
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" id="historiqueInterventions">
-                                <i class="fas fa-history me-1"></i> Historique des interventions
-                            </a>
-                        </li>
+                        {% set current_route = app.request.get('_route') %}
+                        {% set is_tech_page = current_route starts with 'tech' or current_route starts with 'intervention' %}
+                        
+                        {% if app.user.typeUtilisateur == 'technicien' or is_tech_page %}
+                            {# Navigation Technicien #}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('tech_home') }}">
+                                    <i class="fas fa-home me-1"></i> Tableau de bord
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('intervention_historique') }}">
+                                    <i class="fas fa-history me-1"></i> Historique des interventions
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('intervention_recherche_client') }}">
+                                    <i class="fas fa-search me-1"></i> Recherche client
+                                </a>
+                            </li>
+                        {% else %}
+                            {# Navigation Gestionnaire / Admin #}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_gerant_accueil') }}">
+                                    <i class="fas fa-home me-1"></i> Tableau de bord
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_gerant_affectation') }}">
+                                    <i class="fas fa-tasks me-1"></i> Affectations
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_gerant_statistiques') }}">
+                                    <i class="fas fa-chart-bar me-1"></i> Statistiques
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_gerant_personnel') }}">
+                                    <i class="fas fa-users me-1"></i> Personnel
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 align-items-center">
+                        {% if app.user %}
+                            <span class="text-light me-2">
+                                <i class="fas fa-user me-1"></i> {{ app.user.prenom }} {{ app.user.nom }}
+                            </span>
+                        {% endif %}
                         {% if app.user and app.user.typeUtilisateur == 'admin' %}
                             <a href="{{ path('app_admin_choix') }}" class="btn btn-outline-light">
                                 <i class="fas fa-exchange-alt me-1"></i> Changer d'interface
