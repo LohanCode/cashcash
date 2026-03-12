@@ -7,7 +7,57 @@
     <main class="cc-main">
         <h1 class="cc-page-title">Historique des interventions</h1>
 
-        <p>Page à remplir avec la liste des anciennes interventions.</p>
+        <section class="cc-board">
+            <header class="cc-board-header">
+                <h2>Interventions terminees</h2>
+            </header>
+
+            <div class="cc-board-body">
+                {% if interventions is empty %}
+                    <div class="cc-empty-state">
+                        <p>Aucune intervention terminee dans l'historique.</p>
+                    </div>
+                {% else %}
+                    <table class="cc-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Titre</th>
+                                <th>Client</th>
+                                <th>Adresse</th>
+                                <th>Date</th>
+                                <th>Gravite</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for intervention in interventions %}
+                                <tr>
+                                    <td>{{ intervention.id }}</td>
+                                    <td>{{ intervention.titre ?? 'Intervention #' ~ intervention.id }}</td>
+                                    <td>{{ intervention.client ? intervention.client.raisSociale : '-' }}</td>
+                                    <td>{{ intervention.client ? intervention.client.adresseClient : '-' }}</td>
+                                    <td>{{ intervention.dateVisite ? intervention.dateVisite|date('d/m/Y') : '-' }}</td>
+                                    <td>
+                                        <span class="cc-badge cc-badge--{{ intervention.gravite }}">
+                                            {{ intervention.gravite|capitalize }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="cc-footer-actions">
+            <a href="{{ path('tech_home') }}" class="cc-btn cc-btn--secondary">
+                Retour au tableau de bord
+            </a>
+            <a href="{{ path('intervention_mes') }}" class="cc-btn cc-btn--secondary">
+                Voir mes interventions actives
+            </a>
+        </div>
     </main>
 </div>
 {% endblock %}

@@ -16,7 +16,17 @@ class Intervention
     #[ORM\Column]
     private ?int $id = null;
 
-    // Supprime la colonne numIntervenant, remplacée par la relation technicien
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $titre = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $statut = 'ouverte';
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $gravite = 'moyenne';
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateVisite = null;
@@ -49,7 +59,49 @@ class Intervention
         return $this->id;
     }
 
-    // Le getter/setter pour numIntervenant n'est plus nécessaire
+    public function getTitre(): ?string
+    {
+        return $this->titre;
+    }
+
+    public function setTitre(?string $titre): static
+    {
+        $this->titre = $titre;
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function getStatut(): ?string
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(?string $statut): static
+    {
+        $this->statut = $statut;
+        return $this;
+    }
+
+    public function getGravite(): ?string
+    {
+        return $this->gravite;
+    }
+
+    public function setGravite(?string $gravite): static
+    {
+        $this->gravite = $gravite;
+        return $this;
+    }
 
     public function getDateVisite(): ?\DateTimeInterface
     {

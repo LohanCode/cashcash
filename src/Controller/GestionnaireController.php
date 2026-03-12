@@ -12,6 +12,7 @@ use App\Repository\UtilisateurRepository;
 use App\Repository\ClientRepository;
 use App\Repository\AgenceRepository;
 use App\Entity\Utilisateur;
+use App\Entity\Intervention;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class GestionnaireController extends AbstractController
@@ -314,5 +315,190 @@ if ($request->isMethod('POST')) {
         }
         
         return $this->redirectToRoute('app_gerant_personnel');
+    }
+
+    // ========== GESTION DES INTERVENTIONS ==========
+
+    #[Route('/gerant/interventions', name: 'app_gerant_interventions')]
+    public function interventions(
+        InterventionRepository $interventionRepository,
+        UtilisateurRepository $utilisateurRepository,
+        ClientRepository $clientRepository,
+        Request $request
+    ): Response {
+        $statutFiltre = $request->query->get('statut', 'tous');
+        
+        if ($statutFiltre === 'tous') {
+            $interventions = $interventionRepository->findBy([], ['id' => 'DESC']);
+        } else {
+            $interventions = $interventionRepository->findBy(['statut' => $statutFiltre], ['id' => 'DESC']);
+        }
+        
+        $techniciens = $utilisateurRepository->findBy(['type_utilisateur' => 'technicien']);
+        $clients = $clientRepository->findAll();
+        
+        return $this->render('gestionnaire/interventions.html.twig', [
+            'interventions' => $interventions,
+            'techniciens' => $techniciens,
+            'clients' => $clients,
+            'statutFiltre' => $statutFiltre,
+        ]);
+    }
+
+    #[Route('/gerant/interventions/creer', name: 'app_gerant_intervention_creer', methods: ['POST'])]
+    public function interventionCreer(
+        Request $request,
+        EntityManagerInterface $em,
+        UtilisateurRepository $utilisateurRepository,
+        ClientRepository $clientRepository
+    ): Response {
+        $titre = $request->request->get('titre');
+        $description = $request->request->get('description');
+        $gravite = $request->request->get('gravite', 'moyenne');
+        $technicienId = $request->request->get('technicien_id');
+        $clientId = $request->request->get('client_id');
+        $dateVisiteStr = $request->request->get('date_visite');
+        $heureVisiteStr = $request->request->get('heure_visite');
+        
+        if (!$titre || !$technicienId) {
+            $this->addFlash('danger', 'Le titre et le technicien sont obligatoires.');
+            return $this->redirectToRoute('app_gerant_interventions');
+        }
+        
+        $technicien = $utilisateurRepository->find($technicienId);
+        if (!$technicien) {
+            $this->addFlash('danger', 'Technicien introuvable.');
+            return $this->redirectToRoute('app_gerant_interventions');
+        }
+        
+        $intervention = new Intervention();
+        $intervention->setTitre($titre);
+        $intervention->setDescription($description);
+        $intervention->setGravite($gravite);
+        $intervention->setStatut('ouverte');
+        $intervention->setTechnicien($technicien);
+        
+        if ($clientId) {
+            $client = $clientRepository->find($clientId);
+            if ($client) {
+                $intervention->setClient($client);
+            }
+        }
+        
+        if (!empty($dateVisiteStr)) {
+            $dateVisite = \DateTime::createFromFormat('Y-m-d', $dateVisiteStr);
+            if ($dateVisite) {
+                $intervention->setDateVisite($dateVisite);
+            }
+        }
+        
+        if (!empty($heureVisiteStr)) {
+            $heureVisite = \DateTime::createFromFormat('H:i', $heureVisiteStr);
+            if ($heureVisite) {
+                $intervention->setHeureVisite($heureVisite);
+            }
+        }
+        
+        try {
+            $em->persist($intervention);
+            $em->flush();
+            $this->addFlash('success', 'Intervention créée et assignée avec succès.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Erreur lors de la création de l\'intervention.');
+        }
+        
+        return $this->redirectToRoute('app_gerant_interventions');
+    }
+
+    #[Route('/gerant/interventions/{id}/modifier', name: 'app_gerant_intervention_modifier', methods: ['POST'])]
+    public function interventionModifier(
+        int $id,
+        Request $request,
+        EntityManagerInterface $em,
+        InterventionRepository $interventionRepository,
+        UtilisateurRepository $utilisateurRepository,
+        ClientRepository $clientRepository
+    ): Response {
+        $intervention = $interventionRepository->find($id);
+        
+        if (!$intervention) {
+            $this->addFlash('danger', 'Intervention introuvable.');
+            return $this->redirectToRoute('app_gerant_interventions');
+        }
+        
+        $titre = $request->request->get('titre');
+        $description = $request->request->get('description');
+        $gravite = $request->request->get('gravite');
+        $statut = $request->request->get('statut');
+        $technicienId = $request->request->get('technicien_id');
+        $clientId = $request->request->get('client_id');
+        $dateVisiteStr = $request->request->get('date_visite');
+        $heureVisiteStr = $request->request->get('heure_visite');
+        
+        if ($titre) $intervention->setTitre($titre);
+        if ($description !== null) $intervention->setDescription($description);
+        if ($gravite) $intervention->setGravite($gravite);
+        if ($statut) $intervention->setStatut($statut);
+        
+        if ($technicienId) {
+            $technicien = $utilisateurRepository->find($technicienId);
+            if ($technicien) {
+                $intervention->setTechnicien($technicien);
+            }
+        }
+        
+        if ($clientId) {
+            $client = $clientRepository->find($clientId);
+            if ($client) {
+                $intervention->setClient($client);
+            }
+        }
+        
+        if (!empty($dateVisiteStr)) {
+            $dateVisite = \DateTime::createFromFormat('Y-m-d', $dateVisiteStr);
+            if ($dateVisite) {
+                $intervention->setDateVisite($dateVisite);
+            }
+        }
+        
+        if (!empty($heureVisiteStr)) {
+            $heureVisite = \DateTime::createFromFormat('H:i', $heureVisiteStr);
+            if ($heureVisite) {
+                $intervention->setHeureVisite($heureVisite);
+            }
+        }
+        
+        try {
+            $em->flush();
+            $this->addFlash('success', 'Intervention modifiée avec succès.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Erreur lors de la modification.');
+        }
+        
+        return $this->redirectToRoute('app_gerant_interventions');
+    }
+
+    #[Route('/gerant/interventions/{id}/supprimer', name: 'app_gerant_intervention_supprimer', methods: ['POST'])]
+    public function interventionSupprimer(
+        int $id,
+        EntityManagerInterface $em,
+        InterventionRepository $interventionRepository
+    ): Response {
+        $intervention = $interventionRepository->find($id);
+        
+        if (!$intervention) {
+            $this->addFlash('danger', 'Intervention introuvable.');
+            return $this->redirectToRoute('app_gerant_interventions');
+        }
+        
+        try {
+            $em->remove($intervention);
+            $em->flush();
+            $this->addFlash('success', 'Intervention supprimée avec succès.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', 'Impossible de supprimer cette intervention.');
+        }
+        
+        return $this->redirectToRoute('app_gerant_interventions');
     }
 }

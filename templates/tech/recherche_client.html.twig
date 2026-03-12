@@ -7,7 +7,61 @@
     <main class="cc-main">
         <h1 class="cc-page-title">Recherche client</h1>
 
-        <p>Interface de recherche client à implémenter.</p>
+        <section class="cc-board">
+            <header class="cc-board-header">
+                <form action="{{ path('intervention_recherche_client') }}" method="get" class="cc-search-form">
+                    <div class="cc-field-group cc-field-group--search">
+                        <input type="text" name="q" class="cc-input cc-input--search" 
+                               placeholder="Rechercher par nom, numero ou ville..." 
+                               value="{{ query }}">
+                        <button type="submit" class="cc-btn cc-btn--primary">Rechercher</button>
+                    </div>
+                </form>
+            </header>
+
+            <div class="cc-board-body">
+                {% if query == '' %}
+                    <div class="cc-empty-state">
+                        <p>Entrez un terme de recherche pour trouver un client.</p>
+                    </div>
+                {% elseif clients is empty %}
+                    <div class="cc-empty-state">
+                        <p>Aucun client trouve pour "{{ query }}".</p>
+                    </div>
+                {% else %}
+                    <p class="cc-results-count">{{ clients|length }} resultat(s) trouve(s)</p>
+                    
+                    <table class="cc-table">
+                        <thead>
+                            <tr>
+                                <th>Numero</th>
+                                <th>Raison sociale</th>
+                                <th>Adresse</th>
+                                <th>Email</th>
+                                <th>Telephone</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for client in clients %}
+                                <tr>
+                                    <td>{{ client.numClient }}</td>
+                                    <td><strong>{{ client.raisSociale }}</strong></td>
+                                    <td>{{ client.adresseClient ?? '-' }}</td>
+                                    <td>{{ client.emailClient ?? '-' }}</td>
+                                    <td>{{ client.telephoneClient ?? '-' }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="cc-footer-actions">
+            <a href="{{ path('tech_home') }}" class="cc-btn cc-btn--secondary">
+                Retour au tableau de bord
+            </a>
+        </div>
     </main>
 </div>
 {% endblock %}

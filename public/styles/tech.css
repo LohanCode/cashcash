@@ -367,3 +367,356 @@
         text-align: center;
     }
 }
+
+/* ========== Nouveaux styles pour tickets ========== */
+
+/* Statistiques dashboard */
+.cc-stats-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.cc-stat-card {
+    flex: 1;
+    min-width: 120px;
+    padding: 16px 20px;
+    background: var(--cc-white);
+    border-radius: var(--cc-radius);
+    box-shadow: var(--cc-shadow-soft);
+    text-align: center;
+    border-left: 4px solid var(--cc-slate);
+}
+
+.cc-stat-card--warning {
+    border-left-color: #f39c12;
+}
+
+.cc-stat-card--info {
+    border-left-color: #3498db;
+}
+
+.cc-stat-card--primary {
+    border-left-color: var(--cc-accent);
+}
+
+.cc-stat-number {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--cc-charcoal);
+}
+
+.cc-stat-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--cc-slate);
+}
+
+/* Board amélioré */
+.cc-board {
+    max-width: 100%;
+}
+
+.cc-board-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--cc-charcoal);
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--cc-sand);
+}
+
+.cc-board-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+/* Cartes intervention améliorées */
+.cc-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cc-card--full {
+    padding: 24px;
+}
+
+.cc-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cc-card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--cc-charcoal);
+}
+
+.cc-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Badges gravité */
+.cc-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.cc-badge--faible {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.cc-badge--moyenne {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.cc-badge--critique {
+    background: #ffebee;
+    color: #c62828;
+}
+
+/* Status badges */
+.cc-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.cc-status--ouverte {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.cc-status--en_cours {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.cc-status--terminee {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* Contenu carte */
+.cc-card-body {
+    font-size: 14px;
+    color: var(--cc-slate);
+}
+
+.cc-card-client {
+    margin: 0 0 8px;
+}
+
+.cc-card-description {
+    margin: 8px 0;
+    color: var(--cc-charcoal);
+    line-height: 1.5;
+}
+
+.cc-card-date {
+    margin: 8px 0 0;
+    font-size: 13px;
+}
+
+.cc-card-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.cc-info-item {
+    font-size: 14px;
+}
+
+.cc-info-item strong {
+    color: var(--cc-charcoal);
+}
+
+.cc-card-description-full {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cc-sand);
+}
+
+.cc-card-description-full p {
+    margin: 8px 0 0;
+    line-height: 1.6;
+    color: var(--cc-charcoal);
+}
+
+/* Footer carte */
+.cc-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--cc-sand);
+    flex-wrap: wrap;
+}
+
+/* Formulaire statut */
+.cc-status-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cc-status-form label {
+    font-size: 13px;
+    color: var(--cc-slate);
+}
+
+.cc-input--small {
+    padding: 4px 8px;
+    font-size: 13px;
+    width: auto;
+}
+
+.cc-btn--small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* État vide */
+.cc-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--cc-slate);
+}
+
+.cc-empty-state p {
+    margin: 0;
+    font-size: 15px;
+}
+
+/* Footer actions */
+.cc-footer-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+}
+
+/* ========== Table ========== */
+.cc-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--cc-white);
+    border-radius: var(--cc-radius);
+    overflow: hidden;
+    box-shadow: var(--cc-shadow-soft);
+}
+
+.cc-table thead {
+    background: var(--cc-charcoal);
+    color: var(--cc-white);
+}
+
+.cc-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.cc-table td {
+    padding: 12px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--cc-sand);
+}
+
+.cc-table tbody tr:hover {
+    background: var(--cc-cream);
+}
+
+.cc-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ========== Recherche ========== */
+.cc-search-form {
+    width: 100%;
+}
+
+.cc-field-group--search {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.cc-input--search {
+    flex: 1;
+    padding: 10px 16px;
+    font-size: 15px;
+}
+
+.cc-results-count {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: var(--cc-slate);
+}
+
+/* Responsive amélioré */
+@media (max-width: 600px) {
+    .cc-stats-row {
+        flex-direction: column;
+    }
+    
+    .cc-stat-card {
+        min-width: 100%;
+    }
+    
+    .cc-card-header {
+        flex-direction: column;
+    }
+    
+    .cc-card-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .cc-status-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .cc-table {
+        font-size: 12px;
+    }
+    
+    .cc-table th,
+    .cc-table td {
+        padding: 8px 10px;
+    }
+    
+    .cc-field-group--search {
+        flex-direction: column;
+    }
+}

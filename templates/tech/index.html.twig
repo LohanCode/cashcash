@@ -7,16 +7,93 @@
     <main class="cc-main">
         <h1 class="cc-page-title">Tableau de bord</h1>
 
-        {# Page d'accueil technicien : readonly = true (fourni par le contrôleur) #}
-        {% include 'tech/_carte_intervention.html.twig' with { readonly: readonly } %}
+        {# Statistiques rapides #}
+        <div class="cc-stats-row">
+            <div class="cc-stat-card cc-stat-card--warning">
+                <span class="cc-stat-number">{{ stats.ouvertes }}</span>
+                <span class="cc-stat-label">Ouvertes</span>
+            </div>
+            <div class="cc-stat-card cc-stat-card--info">
+                <span class="cc-stat-number">{{ stats.en_cours }}</span>
+                <span class="cc-stat-label">En cours</span>
+            </div>
+            <div class="cc-stat-card cc-stat-card--primary">
+                <span class="cc-stat-number">{{ stats.total }}</span>
+                <span class="cc-stat-label">Total actives</span>
+            </div>
+        </div>
+
+        {# Liste des interventions #}
+        <section class="cc-board">
+            <header class="cc-board-header">
+                <h2>Mes interventions en cours</h2>
+            </header>
+
+            <div class="cc-board-body">
+                {% if interventions is empty %}
+                    <div class="cc-empty-state">
+                        <p>Aucune intervention en cours.</p>
+                    </div>
+                {% else %}
+                    {% for intervention in interventions %}
+                        <div class="cc-card">
+                            <div class="cc-card-header">
+                                <h3 class="cc-card-title">{{ intervention.titre ?? 'Intervention #' ~ intervention.id }}</h3>
+                                <span class="cc-badge cc-badge--{{ intervention.gravite }}">
+                                    {{ intervention.gravite|capitalize }}
+                                </span>
+                            </div>
+                            
+                            <div class="cc-card-body">
+                                <p class="cc-card-client">
+                                    <strong>Client :</strong> 
+                                    {% if intervention.client %}
+                                        {{ intervention.client.raisSociale }} - {{ intervention.client.adresseClient }}
+                                    {% else %}
+                                        Non assigne
+                                    {% endif %}
+                                </p>
+                                
+                                {% if intervention.description %}
+                                    <p class="cc-card-description">{{ intervention.description|slice(0, 150) }}{% if intervention.description|length > 150 %}...{% endif %}</p>
+                                {% endif %}
+                                
+                                <p class="cc-card-date">
+                                    <strong>Date prévue :</strong> 
+                                    {% if intervention.dateVisite %}
+                                        {{ intervention.dateVisite|date('d/m/Y') }}
+                                    {% else %}
+                                        Non planifiée
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div class="cc-card-footer">
+                                <span class="cc-status cc-status--{{ intervention.statut }}">
+                                    {{ intervention.statut|replace({'_': ' '})|capitalize }}
+                                </span>
+                                
+                                <div class="cc-actions">
+                                    <form action="{{ path('intervention_modifier_statut', {id: intervention.id}) }}" method="post" class="cc-status-form">
+                                        <select name="statut" class="cc-input cc-input--small">
+                                            <option value="ouverte" {{ intervention.statut == 'ouverte' ? 'selected' : '' }}>Ouverte</option>
+                                            <option value="en_cours" {{ intervention.statut == 'en_cours' ? 'selected' : '' }}>En cours</option>
+                                            <option value="terminee" {{ intervention.statut == 'terminee' ? 'selected' : '' }}>Terminée</option>
+                                        </select>
+                                        <button type="submit" class="cc-btn cc-btn--small cc-btn--primary">Mettre à jour</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </section>
 
         <div class="cc-footer-actions">
-            {# Sur la home, on n'affiche pas le gros bouton si lecture seule #}
-            {% if not readonly and is_granted('ROLE_GERANT') %}
-                <a href="{{ path('intervention_mes') }}" class="cc-btn cc-btn--primary">
-                    Ajouter une intervention
-                </a>
-            {% endif %}
+            <a href="{{ path('intervention_mes') }}" class="cc-btn cc-btn--secondary">
+                Voir toutes mes interventions
+            </a>
         </div>
     </main>
 </div>

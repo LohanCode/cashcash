@@ -1,0 +1,315 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des interventions{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/gerant.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="gestion-container">
+    <h1 class="page-title">Gestion des interventions</h1>
+
+    {# Messages flash #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Bouton et filtres #}
+    <div class="actions-bar">
+        <button class="btn btn-primary" onclick="openModal('modalCreer')">
+            + Nouvelle intervention
+        </button>
+        
+        <div class="filters">
+            <a href="{{ path('app_gerant_interventions', {statut: 'tous'}) }}" 
+               class="btn btn-filter {{ statutFiltre == 'tous' ? 'active' : '' }}">Tous</a>
+            <a href="{{ path('app_gerant_interventions', {statut: 'ouverte'}) }}" 
+               class="btn btn-filter {{ statutFiltre == 'ouverte' ? 'active' : '' }}">Ouvertes</a>
+            <a href="{{ path('app_gerant_interventions', {statut: 'en_cours'}) }}" 
+               class="btn btn-filter {{ statutFiltre == 'en_cours' ? 'active' : '' }}">En cours</a>
+            <a href="{{ path('app_gerant_interventions', {statut: 'terminee'}) }}" 
+               class="btn btn-filter {{ statutFiltre == 'terminee' ? 'active' : '' }}">Terminees</a>
+        </div>
+    </div>
+
+    {# Tableau des interventions #}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Titre</th>
+                <th>Client</th>
+                <th>Technicien</th>
+                <th>Gravite</th>
+                <th>Statut</th>
+                <th>Date prevue</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for intervention in interventions %}
+                <tr>
+                    <td>{{ intervention.id }}</td>
+                    <td><strong>{{ intervention.titre ?? 'Sans titre' }}</strong></td>
+                    <td>{{ intervention.client ? intervention.client.raisSociale : '-' }}</td>
+                    <td>
+                        {% if intervention.technicien %}
+                            {{ intervention.technicien.prenom }} {{ intervention.technicien.nom }}
+                        {% else %}
+                            <span class="text-warning">Non assigne</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ intervention.gravite ?? 'moyenne' }}">
+                            {{ intervention.gravite ?? 'moyenne' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge badge-statut-{{ intervention.statut ?? 'ouverte' }}">
+                            {{ intervention.statut ?? 'ouverte' }}
+                        </span>
+                    </td>
+                    <td>{{ intervention.dateVisite ? intervention.dateVisite|date('d/m/Y') : '-' }}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn-small btn-secondary" onclick="openModal('modalModifier{{ intervention.id }}')">
+                            Modifier
+                        </button>
+                        <form action="{{ path('app_gerant_intervention_supprimer', {id: intervention.id}) }}" method="post" style="display:inline;" onsubmit="return confirm('Supprimer cette intervention ?')">
+                            <button type="submit" class="btn btn-small btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center">Aucune intervention trouvee.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{# Modal Creation #}
+<div id="modalCreer" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('modalCreer')">&times;</span>
+        <h2>Nouvelle intervention</h2>
+        
+        <form action="{{ path('app_gerant_intervention_creer') }}" method="post">
+            <div class="form-group">
+                <label>Titre *</label>
+                <input type="text" name="titre" required placeholder="Ex: Reparation TPE">
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="3" placeholder="Details de l'intervention..."></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Gravite</label>
+                    <select name="gravite">
+                        <option value="faible">Faible</option>
+                        <option value="moyenne" selected>Moyenne</option>
+                        <option value="critique">Critique</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Technicien *</label>
+                    <select name="technicien_id" required>
+                        <option value="">-- Selectionner --</option>
+                        {% for tech in techniciens %}
+                            <option value="{{ tech.id }}">{{ tech.prenom }} {{ tech.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Client</label>
+                    <select name="client_id">
+                        <option value="">-- Selectionner --</option>
+                        {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.raisSociale }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Date prevue</label>
+                    <input type="date" name="date_visite">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Heure</label>
+                <input type="time" name="heure_visite">
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalCreer')">Annuler</button>
+                <button type="submit" class="btn btn-primary">Creer l'intervention</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Modals Modification #}
+{% for intervention in interventions %}
+<div id="modalModifier{{ intervention.id }}" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('modalModifier{{ intervention.id }}')">&times;</span>
+        <h2>Modifier l'intervention #{{ intervention.id }}</h2>
+        
+        <form action="{{ path('app_gerant_intervention_modifier', {id: intervention.id}) }}" method="post">
+            <div class="form-group">
+                <label>Titre</label>
+                <input type="text" name="titre" value="{{ intervention.titre }}">
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="3">{{ intervention.description }}</textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Gravite</label>
+                    <select name="gravite">
+                        <option value="faible" {{ intervention.gravite == 'faible' ? 'selected' : '' }}>Faible</option>
+                        <option value="moyenne" {{ intervention.gravite == 'moyenne' ? 'selected' : '' }}>Moyenne</option>
+                        <option value="critique" {{ intervention.gravite == 'critique' ? 'selected' : '' }}>Critique</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Statut</label>
+                    <select name="statut">
+                        <option value="ouverte" {{ intervention.statut == 'ouverte' ? 'selected' : '' }}>Ouverte</option>
+                        <option value="en_cours" {{ intervention.statut == 'en_cours' ? 'selected' : '' }}>En cours</option>
+                        <option value="terminee" {{ intervention.statut == 'terminee' ? 'selected' : '' }}>Terminee</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Technicien</label>
+                    <select name="technicien_id">
+                        <option value="">-- Selectionner --</option>
+                        {% for tech in techniciens %}
+                            <option value="{{ tech.id }}" {{ intervention.technicien and intervention.technicien.id == tech.id ? 'selected' : '' }}>
+                                {{ tech.prenom }} {{ tech.nom }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Client</label>
+                    <select name="client_id">
+                        <option value="">-- Selectionner --</option>
+                        {% for client in clients %}
+                            <option value="{{ client.id }}" {{ intervention.client and intervention.client.id == client.id ? 'selected' : '' }}>
+                                {{ client.raisSociale }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Date prevue</label>
+                    <input type="date" name="date_visite" value="{{ intervention.dateVisite ? intervention.dateVisite|date('Y-m-d') : '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Heure</label>
+                    <input type="time" name="heure_visite" value="{{ intervention.heureVisite ? intervention.heureVisite|date('H:i') : '' }}">
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalModifier{{ intervention.id }}')">Annuler</button>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+
+// Fermer modal si clic en dehors
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+}
+</script>
+
+<style>
+/* Styles specifiques aux badges statut */
+.badge-statut-ouverte {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+.badge-statut-en_cours {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+.badge-statut-terminee {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-faible {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+.badge-moyenne {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+.badge-critique {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.filters {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-filter {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.btn-filter.active {
+    background: var(--cc-accent, #d63031);
+    color: white;
+    border-color: var(--cc-accent, #d63031);
+}
+
+.text-warning {
+    color: #f39c12;
+    font-style: italic;
+}
+</style>
+{% endblock %}

@@ -1,21 +1,105 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Gestion des interventions{% endblock %}
+{% block title %}Mes interventions{% endblock %}
 
 {% block body %}
 <div class="cc-app">
     <main class="cc-main">
-        <h1 class="cc-page-title">Gestion des interventions</h1>
+        <h1 class="cc-page-title">Mes interventions</h1>
 
-        {# Ici readonly = false → boutons d’action visibles pour le gérant #}
-        {% include 'tech/_carte_intervention.html.twig' with { readonly: readonly } %}
+        <section class="cc-board">
+            <header class="cc-board-header">
+                <h2>Interventions actives</h2>
+            </header>
+
+            <div class="cc-board-body">
+                {% if interventions is empty %}
+                    <div class="cc-empty-state">
+                        <p>Aucune intervention active.</p>
+                    </div>
+                {% else %}
+                    {% for intervention in interventions %}
+                        <div class="cc-card cc-card--full">
+                            <div class="cc-card-header">
+                                <h3 class="cc-card-title">{{ intervention.titre ?? 'Intervention #' ~ intervention.id }}</h3>
+                                <div class="cc-badges">
+                                    <span class="cc-badge cc-badge--{{ intervention.gravite }}">
+                                        {{ intervention.gravite|capitalize }}
+                                    </span>
+                                    <span class="cc-status cc-status--{{ intervention.statut }}">
+                                        {{ intervention.statut|replace({'_': ' '})|capitalize }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="cc-card-body">
+                                <div class="cc-card-info-grid">
+                                    <div class="cc-info-item">
+                                        <strong>Client :</strong>
+                                        {% if intervention.client %}
+                                            {{ intervention.client.raisSociale }}
+                                        {% else %}
+                                            Non assigne
+                                        {% endif %}
+                                    </div>
+                                    <div class="cc-info-item">
+                                        <strong>Adresse :</strong>
+                                        {% if intervention.client %}
+                                            {{ intervention.client.adresseClient }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </div>
+                                    <div class="cc-info-item">
+                                        <strong>Date prevue :</strong>
+                                        {% if intervention.dateVisite %}
+                                            {{ intervention.dateVisite|date('d/m/Y') }}
+                                        {% else %}
+                                            Non planifiee
+                                        {% endif %}
+                                    </div>
+                                    <div class="cc-info-item">
+                                        <strong>Heure :</strong>
+                                        {% if intervention.heureVisite %}
+                                            {{ intervention.heureVisite|date('H:i') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                {% if intervention.description %}
+                                    <div class="cc-card-description-full">
+                                        <strong>Description :</strong>
+                                        <p>{{ intervention.description }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="cc-card-footer">
+                                <form action="{{ path('intervention_modifier_statut', {id: intervention.id}) }}" method="post" class="cc-status-form">
+                                    <label>Changer le statut :</label>
+                                    <select name="statut" class="cc-input">
+                                        <option value="ouverte" {{ intervention.statut == 'ouverte' ? 'selected' : '' }}>Ouverte</option>
+                                        <option value="en_cours" {{ intervention.statut == 'en_cours' ? 'selected' : '' }}>En cours</option>
+                                        <option value="terminee" {{ intervention.statut == 'terminee' ? 'selected' : '' }}>Terminee</option>
+                                    </select>
+                                    <button type="submit" class="cc-btn cc-btn--primary">Mettre a jour</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </section>
 
         <div class="cc-footer-actions">
-            {% if is_granted('ROLE_GERANT') %}
-                <a href="#" class="cc-btn cc-btn--primary">
-                    Ajouter une intervention
-                </a>
-            {% endif %}
+            <a href="{{ path('tech_home') }}" class="cc-btn cc-btn--secondary">
+                Retour au tableau de bord
+            </a>
+            <a href="{{ path('intervention_historique') }}" class="cc-btn cc-btn--secondary">
+                Voir l'historique
+            </a>
         </div>
     </main>
 </div>

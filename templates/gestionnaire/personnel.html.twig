@@ -43,10 +43,6 @@
                class="btn-filtre {{ typeFiltre == 'technicien' ? 'active' : '' }}">
                 <i class="fas fa-wrench"></i> Techniciens
             </a>
-            <a href="{{ path('app_gerant_personnel', {type: 'employe'}) }}" 
-               class="btn-filtre {{ typeFiltre == 'employe' ? 'active' : '' }}">
-                <i class="fas fa-user"></i> Employés
-            </a>
             <a href="{{ path('app_gerant_personnel', {type: 'gestionnaire'}) }}" 
                class="btn-filtre {{ typeFiltre == 'gestionnaire' ? 'active' : '' }}">
                 <i class="fas fa-user-tie"></i> Gestionnaires
@@ -154,7 +150,6 @@
                         <label for="type_utilisateur">Type *</label>
                         <select id="type_utilisateur" name="type_utilisateur" required>
                             <option value="">-- Sélectionner --</option>
-                            <option value="employe">Employé</option>
                             <option value="technicien">Technicien</option>
                             <option value="gestionnaire">Gestionnaire</option>
                             <option value="admin">Administrateur</option>
@@ -216,7 +211,6 @@
                     <div class="form-group">
                         <label for="edit_type">Type *</label>
                         <select id="edit_type" name="type_utilisateur" required>
-                            <option value="employe">Employé</option>
                             <option value="technicien">Technicien</option>
                             <option value="gestionnaire">Gestionnaire</option>
                             <option value="admin">Administrateur</option>
