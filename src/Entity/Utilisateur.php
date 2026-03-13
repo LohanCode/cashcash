@@ -8,11 +8,22 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[ORM\Table(name: 'utilisateur')] // Nom de la table en base de données
 class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 8,
+        minMessage: "Le mot de passe doit faire au moins {{limit}} caractères"
+    )]
+    #[Assert\Regex(
+        pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/",
+        message: "Le mot de passe doit contenir une majuscule, une minuscule, unchiffre et un caractère spécial"
+    )]
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
