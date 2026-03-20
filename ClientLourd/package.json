@@ -1,0 +1,49 @@
+{
+  "name": "cashcash-client-lourd",
+  "version": "1.0.0",
+  "description": "Client lourd pour l'application Symfony CashCash via Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win",
+    "build": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.cashcash.clientlourd",
+    "productName": "CashCash",
+    "directories": {
+      "output": "dist"
+    },
+    "extraResources": [
+      {
+        "from": "../",
+        "to": "app-backend",
+        "filter": [
+          "**/*",
+          "!ClientLourd/**",
+          "!var/cache/**",
+          "!var/log/**",
+          "!.git/**",
+          "!node_modules/**"
+        ]
+      },
+      {
+        "from": "php-win",
+        "to": "php"
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^26.8.1"
+  }
+}

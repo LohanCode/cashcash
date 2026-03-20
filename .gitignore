@@ -22,3 +22,10 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+# Electron client artifacts
+/ClientLourd/node_modules/
+/ClientLourd/dist/
+/ClientLourd/*.exe
+/ClientLourd/*.blockmap
+/ClientLourd/*.7z

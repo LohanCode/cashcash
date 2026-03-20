@@ -8,9 +8,14 @@ use App\Entity\Intervention;
 use App\Entity\Utilisateur;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
+    {
+    }
+
     public function load(ObjectManager $manager): void
     {
         // Créer une agence
@@ -37,11 +42,12 @@ class AppFixtures extends Fixture
 
         foreach ($techData as $i => $data) {
             $tech = new Utilisateur();
+            $tech->setMatricule(sprintf('TECH%03d', $i + 1));
             $tech->setNom($data[0]);
             $tech->setPrenom($data[1]);
             $tech->setEmail($data[2]);
             $tech->setTypeUtilisateur('technicien');
-            $tech->setPassword(password_hash('password123', PASSWORD_BCRYPT));
+            $tech->setPassword($this->passwordHasher->hashPassword($tech, 'password123'));
             $tech->setRoles(['ROLE_TECH']);
             $tech->setAgence($i < 2 ? $agence : $agence2);
             $manager->persist($tech);
@@ -50,11 +56,12 @@ class AppFixtures extends Fixture
 
         // Créer un gestionnaire
         $gerant = new Utilisateur();
+        $gerant->setMatricule('GEST001');
         $gerant->setNom('Dupont');
         $gerant->setPrenom('Jean');
         $gerant->setEmail('jean.dupont@cashcash.fr');
         $gerant->setTypeUtilisateur('gestionnaire');
-        $gerant->setPassword(password_hash('admin123', PASSWORD_BCRYPT));
+        $gerant->setPassword($this->passwordHasher->hashPassword($gerant, 'admin123'));
         $gerant->setRoles(['ROLE_ADMIN']);
         $gerant->setAgence($agence);
         $manager->persist($gerant);
