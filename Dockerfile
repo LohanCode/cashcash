@@ -28,20 +28,22 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV APP_ENV=prod
 RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
 
-# 5. Gestion des dossiers de cache et logs
+# 5. Gestion des dossiers de cache et logs avec permissions strictes
+# On crée les dossiers et on donne la propriété à www-data AVANT de lancer quoi que ce soit
 RUN mkdir -p var/cache var/log var/sessions \
     && chown -R www-data:www-data var/ \
-    && chmod -R 777 var/
+    && chmod -R 775 var/
 
-# 6. SCRIPT DE DÉMARRAGE
-# On utilise printf qui est beaucoup plus stable que echo pour les scripts multi-lignes dans Docker
+# 6. SCRIPT DE DÉMARRAGE CORRIGÉ
+# On ajoute une ligne pour forcer les droits à chaque démarrage au cas où
 RUN printf "#!/bin/sh\n\
+echo 'Correction des droits...'\n\
+chown -R www-data:www-data var/\n\
 echo 'Lancement des migrations...'\n\
-php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration\n\
+su www-data -s /bin/sh -c 'php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration'\n\
 echo 'Démarrage d Apache...'\n\
 apache2-foreground" > /usr/local/bin/app-entrypoint.sh
 
 RUN chmod +x /usr/local/bin/app-entrypoint.sh
 
-# On définit ce script comme point d'entrée
 ENTRYPOINT ["/usr/local/bin/app-entrypoint.sh"]
