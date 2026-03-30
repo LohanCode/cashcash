@@ -33,13 +33,13 @@ RUN mkdir -p var/cache var/log var/sessions \
     && chown -R www-data:www-data var/ \
     && chmod -R 777 var/
 
-# 6. SCRIPT DE DÉMARRAGE : Migrations + Lancement Serveur
-# On crée un petit script shell qui s'exécute à CHAQUE démarrage du conteneur
-RUN echo '#!/bin/sh\n\
-echo "Lancement des migrations..."\n\
+# 6. SCRIPT DE DÉMARRAGE
+# On utilise printf qui est beaucoup plus stable que echo pour les scripts multi-lignes dans Docker
+RUN printf "#!/bin/sh\n\
+echo 'Lancement des migrations...'\n\
 php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration\n\
-echo "Démarrage d'Apache..."\n\
-apache2-foreground' > /usr/local/bin/app-entrypoint.sh
+echo 'Démarrage d Apache...'\n\
+apache2-foreground" > /usr/local/bin/app-entrypoint.sh
 
 RUN chmod +x /usr/local/bin/app-entrypoint.sh
 
