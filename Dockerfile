@@ -17,6 +17,5 @@ COPY . .
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 ENV APP_ENV=prod
-RUN composer install --no-dev --optimize-autoloader --no-scripts
-
+RUN composer install --no-dev --optimize-autoloader --no-scripts --ignore-platform-reqs
 RUN chown -R www-data:www-data var/
