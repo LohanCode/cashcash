@@ -61,6 +61,9 @@
                                     {% endfor %}
                                 </select>
                                 <button type="submit" class="btn btn-sm btn-primary">Affecter</button>
+                                {% if intervention.technicien %}
+                                    <a href="{{ path('app_intervention_pdf', {id: intervention.id}) }}" class="btn btn-sm btn-info" target="_blank" title="Telecharger Fiche PDF">PDF</a>
+                                {% endif %}
                                 </div>
                             </form>
                         </td>

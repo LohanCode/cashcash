@@ -42,11 +42,10 @@ class Materiel
     private ?TypeMateriel $typeMateriel = null;
 
     // 3. Relation ManyToOne avec ContratMaintenance (peut être NULL)
-    #[ORM\ManyToOne(inversedBy: 'materielsAssures')]
+    #[ORM\ManyToOne]
     private ?ContratMaintenance $contratMaintenance = null;
 
-    // 4. Relation OneToMany avec la table de jointure Controler
-    #[ORM\OneToMany(mappedBy: 'materiel', targetEntity: Controler::class)]
+    // 4. Relation avec la table de jointure Controler non mappée par Doctrine car l'inverse n'existe pas
     private Collection $controlers;
 
     public function __construct()

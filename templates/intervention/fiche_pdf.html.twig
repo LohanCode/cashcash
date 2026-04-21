@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche d'intervention n°{{ intervention.id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #0d6efd;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+            text-transform: uppercase;
+        }
+        .row {
+            width: 100%;
+            margin-bottom: 20px;
+            clear: both;
+        }
+        .col-half {
+            width: 48%;
+            float: left;
+        }
+        .col-half.right {
+            float: right;
+        }
+        .box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .box h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .detail-table th, .detail-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        .detail-table th {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .signature-box {
+            margin-top: 50px;
+            height: 120px;
+            border: 1px dashed #ccc;
+            padding: 10px;
+        }
+        .clear {
+            clear: both;
+        }
+        .info-label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>CASHCASH</h1>
+        <p>Fiche d'intervention n° {{ intervention.id }} - Éditée le {{ 'now'|date('d/m/Y') }}</p>
+    </div>
+
+    <div class="row">
+        <!-- Informations Client -->
+        <div class="col-half box">
+            <h3>Informations Client</h3>
+            <p><span class="info-label">Raison Sociale :</span> {{ intervention.client ? intervention.client.raisSociale : 'Non assigné' }}</p>
+            <p><span class="info-label">Adresse :</span><br>
+               {{ intervention.client ? intervention.client.adresseClient : '' }}
+            </p>
+        </div>
+
+        <!-- Informations Technicien -->
+        <div class="col-half right box">
+            <h3>Informations Assignation</h3>
+            <p><span class="info-label">Technicien assigné :</span> {{ intervention.technicien ? intervention.technicien.prenom ~ ' ' ~ intervention.technicien.nom : 'Non défini' }}</p>
+            <p><span class="info-label">Date prévue :</span> {{ intervention.dateVisite ? intervention.dateVisite|date('d/m/Y') : 'À planifier' }}</p>
+            <p><span class="info-label">Heure prévue :</span> {{ intervention.heureVisite ? intervention.heureVisite|date('H:i') : '' }}</p>
+            <p><span class="info-label">Statut actuel :</span> {{ intervention.statut|capitalize }}</p>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+
+    <!-- Détails de l'intervention -->
+    <div class="row box" style="margin-top: 20px;">
+        <h3>Détails de l'intervention</h3>
+        <p><span class="info-label">Motif / Titre :</span> {{ intervention.titre }}</p>
+        <p><span class="info-label">Description / Remarques :</span><br>{{ intervention.description|nl2br }}</p>
+        <p><span class="info-label">Gravité :</span> {{ intervention.gravite|capitalize }}</p>
+    </div>
+
+    <!-- Espace pour rapport d'intervention (à remplir à la main par le tech) -->
+    <div class="row box" style="margin-top: 20px;">
+        <h3>Rapport du Technicien (à remplir)</h3>
+        <p><span class="info-label">Heure d'arrivée :</span> _____ : _____</p>
+        <p><span class="info-label">Heure de départ :</span> _____ : _____</p>
+        <br>
+        <p><span class="info-label">Nature du dépannage / Travaux réalisés :</span></p>
+        <div style="height: 100px; border-bottom: 1px dotted #999;"></div>
+        <div style="height: 30px; border-bottom: 1px dotted #999;"></div>
+        <div style="height: 30px; border-bottom: 1px dotted #999;"></div>
+    </div>
+
+    <!-- Signatures -->
+    <div class="row" style="margin-top: 30px;">
+        <div class="col-half">
+            <h4 style="text-align: center;">Signature du Technicien</h4>
+            <div class="signature-box"></div>
+        </div>
+        <div class="col-half right">
+            <h4 style="text-align: center;">Signature du Client<br><small>(Précédée de la mention "Bon pour accord")</small></h4>
+            <div class="signature-box"></div>
+        </div>
+    </div>
+    
+    <div class="clear"></div>
+
+    <div style="text-align: center; margin-top: 30px; font-size: 11px; color: #777;">
+        CashCash - Tous droits réservés. L'intervention est soumise aux conditions générales de maintenance.
+    </div>
+
+</body>
+</html>

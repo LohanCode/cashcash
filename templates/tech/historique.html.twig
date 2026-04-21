@@ -18,34 +18,40 @@
                         <p>Aucune intervention terminee dans l'historique.</p>
                     </div>
                 {% else %}
-                    <table class="cc-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Titre</th>
-                                <th>Client</th>
-                                <th>Adresse</th>
-                                <th>Date</th>
-                                <th>Gravite</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for intervention in interventions %}
+                    <div style="overflow-x: auto; width: 100%;">
+                        <table class="cc-table">
+                            <thead>
                                 <tr>
-                                    <td>{{ intervention.id }}</td>
-                                    <td>{{ intervention.titre ?? 'Intervention #' ~ intervention.id }}</td>
-                                    <td>{{ intervention.client ? intervention.client.raisSociale : '-' }}</td>
-                                    <td>{{ intervention.client ? intervention.client.adresseClient : '-' }}</td>
-                                    <td>{{ intervention.dateVisite ? intervention.dateVisite|date('d/m/Y') : '-' }}</td>
-                                    <td>
-                                        <span class="cc-badge cc-badge--{{ intervention.gravite }}">
-                                            {{ intervention.gravite|capitalize }}
-                                        </span>
-                                    </td>
+                                    <th>#</th>
+                                    <th>Titre</th>
+                                    <th>Client</th>
+                                    <th>Adresse</th>
+                                    <th>Date</th>
+                                    <th>Gravité</th>
+                                    <th>Actions</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {% for intervention in interventions %}
+                                    <tr>
+                                        <td>{{ intervention.id }}</td>
+                                        <td>{{ intervention.titre ?? 'Intervention #' ~ intervention.id }}</td>
+                                        <td>{{ intervention.client ? intervention.client.raisSociale : '-' }}</td>
+                                        <td>{{ intervention.client ? intervention.client.adresseClient : '-' }}</td>
+                                        <td>{{ intervention.dateVisite ? intervention.dateVisite|date('d/m/Y') : '-' }}</td>
+                                        <td>
+                                            <span class="cc-badge cc-badge--{{ intervention.gravite }}">
+                                                {{ intervention.gravite|capitalize }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('app_intervention_pdf', {id: intervention.id}) }}" class="cc-btn cc-btn--secondary" style="padding: 4px 8px; font-size: 12px;" target="_blank">PDF</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 {% endif %}
             </div>
         </section>

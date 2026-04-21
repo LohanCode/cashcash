@@ -221,7 +221,7 @@ if ($request->isMethod('POST')) {
             $em->flush();
             $this->addFlash('success', 'Utilisateur créé avec succès.');
         } catch (\Exception $e) {
-            $this->addFlash('danger', 'Erreur lors de la création : email déjà utilisé ?');
+            $this->addFlash('danger', 'Erreur réelle : ' . $e->getMessage());
         }
         
         return $this->redirectToRoute('app_gerant_personnel');

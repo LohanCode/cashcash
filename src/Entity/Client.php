@@ -52,8 +52,7 @@ class Client
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Materiel::class)]
     private Collection $materiels;
 
-    // 3. Relation OneToMany avec ContratMaintenance
-    #[ORM\OneToMany(mappedBy: 'client', targetEntity: ContratMaintenance::class)]
+    // 3. Relation avec ContratMaintenance (non mappée par Doctrine car l'inverse n'existe pas)
     private Collection $contrats;
 
     // 4. Relation OneToMany avec Intervention

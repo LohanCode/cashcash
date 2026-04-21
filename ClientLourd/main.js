@@ -97,8 +97,9 @@ function startPhpServer() {
         env.DATABASE_URL = databaseUrl;
     }
 
-    // Démarrage du serveur PHP intégré
-    phpServerProcess = spawn(phpPath, ['-S', `localhost:${PORT}`, '-t', publicDir], {
+    // Démarrage du serveur PHP intégré avec le routeur
+    const routerScript = path.join(publicDir, 'router.php');
+    phpServerProcess = spawn(phpPath, ['-S', `localhost:${PORT}`, '-t', publicDir, routerScript], {
         cwd: projectDir,
         env: env
     });

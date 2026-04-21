@@ -75,6 +75,7 @@
                     </td>
                     <td>{{ intervention.dateVisite ? intervention.dateVisite|date('d/m/Y') : '-' }}</td>
                     <td class="actions-cell">
+                        <a href="{{ path('app_intervention_pdf', {id: intervention.id}) }}" class="btn btn-small btn-info" target="_blank">PDF</a>
                         <button class="btn btn-small btn-secondary" onclick="openModal('modalModifier{{ intervention.id }}')">
                             Modifier
                         </button>

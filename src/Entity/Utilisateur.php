@@ -61,7 +61,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'technicien', targetEntity: Intervention::class)]
     private Collection $interventionsAffectees;
 
-    #[ORM\OneToMany(mappedBy: 'technicien', targetEntity: Intervention::class)]
+    // Cette collection ne peut pas être mappée via 'technicien' car la relation est déjà prise par interventionsAffectees
     private Collection $interventionsRealisees;
 
     public function __construct()

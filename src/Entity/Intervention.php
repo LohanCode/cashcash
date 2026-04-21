@@ -44,8 +44,7 @@ class Intervention
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $technicien = null;
 
-    // 3. Relation OneToMany avec Controler (la table qui porte les détails du contrôle)
-    #[ORM\OneToMany(mappedBy: 'intervention', targetEntity: Controler::class)]
+    // 3. Relation OneToMany avec Controler - non mappée par Doctrine car le paramètre intervention est absent sur Controler
     private Collection $controles;
 
 
