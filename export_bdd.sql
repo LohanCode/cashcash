@@ -1,18 +1,224 @@
 ﻿--
--- PostgreSQL database dump
---
+-- MySQL import script (CashCash)
+-- Base: cashcash (MySQL 8)
 
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS=0;
+
+CREATE DATABASE IF NOT EXISTS `cashcash` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `cashcash`;
+
+DROP TABLE IF EXISTS `materiel`;
+DROP TABLE IF EXISTS `intervention`;
+DROP TABLE IF EXISTS `client`;
+DROP TABLE IF EXISTS `utilisateur`;
+DROP TABLE IF EXISTS `type_materiel`;
+DROP TABLE IF EXISTS `famille`;
+DROP TABLE IF EXISTS `contrat_maintenance`;
+DROP TABLE IF EXISTS `type_contrat`;
+DROP TABLE IF EXISTS `controler`;
+DROP TABLE IF EXISTS `messenger_messages`;
+DROP TABLE IF EXISTS `doctrine_migration_versions`;
+DROP TABLE IF EXISTS `agence`;
+
+CREATE TABLE `agence` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `num_agence` VARCHAR(255) NOT NULL,
+  `nom_agence` VARCHAR(255) DEFAULT NULL,
+  `adresse_agence` VARCHAR(255) DEFAULT NULL,
+  `tel_agence` INT DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `famille` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `code_famille` VARCHAR(255) NOT NULL,
+  `libelle_famille` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `type_materiel` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ref_interne` VARCHAR(255) NOT NULL,
+  `libelle_type_materiel` VARCHAR(255) NOT NULL,
+  `famille_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_d52d976d97a77b84` (`famille_id`),
+  CONSTRAINT `fk_d52d976d97a77b84` FOREIGN KEY (`famille_id`) REFERENCES `famille` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `contrat_maintenance` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `num_contrat` VARCHAR(255) NOT NULL,
+  `date_signature` DATETIME DEFAULT NULL,
+  `date_echeance` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `type_contrat` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ref_type_contrat` VARCHAR(255) NOT NULL,
+  `delail_intervention` VARCHAR(255) DEFAULT NULL,
+  `taux_applicable` VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `utilisateur` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `type_utilisateur` VARCHAR(50) NOT NULL,
+  `nom` VARCHAR(255) DEFAULT NULL,
+  `prenom` VARCHAR(255) DEFAULT NULL,
+  `email` VARCHAR(180) NOT NULL,
+  `roles` JSON NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `agence_id` INT NOT NULL,
+  `matricule` VARCHAR(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_1d1c63b3e7927c74` (`email`),
+  UNIQUE KEY `uniq_1d1c63b31f0af90d` (`matricule`),
+  KEY `idx_1d1c63b3d725330d` (`agence_id`),
+  CONSTRAINT `fk_1d1c63b3d725330d` FOREIGN KEY (`agence_id`) REFERENCES `agence` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `client` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `num_client` VARCHAR(255) NOT NULL,
+  `rais_sociale` VARCHAR(255) DEFAULT NULL,
+  `siren` BIGINT DEFAULT NULL,
+  `code_ape` INT DEFAULT NULL,
+  `adresse_client` VARCHAR(255) DEFAULT NULL,
+  `telephone_client` INT DEFAULT NULL,
+  `email_client` VARCHAR(255) DEFAULT NULL,
+  `duree_deplacement` VARCHAR(255) DEFAULT NULL,
+  `distance_km` DECIMAL(10,2) DEFAULT NULL,
+  `agence_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_c7440455d725330d` (`agence_id`),
+  CONSTRAINT `fk_c7440455d725330d` FOREIGN KEY (`agence_id`) REFERENCES `agence` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `intervention` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `date_visite` DATE DEFAULT NULL,
+  `heure_visite` TIME DEFAULT NULL,
+  `client_id` INT NOT NULL,
+  `technicien_id` INT NOT NULL,
+  `titre` VARCHAR(255) DEFAULT NULL,
+  `description` LONGTEXT DEFAULT NULL,
+  `statut` VARCHAR(50) DEFAULT NULL,
+  `gravite` VARCHAR(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_d11814ab13457256` (`technicien_id`),
+  KEY `idx_d11814ab19eb6921` (`client_id`),
+  CONSTRAINT `fk_d11814ab13457256` FOREIGN KEY (`technicien_id`) REFERENCES `utilisateur` (`id`),
+  CONSTRAINT `fk_d11814ab19eb6921` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `materiel` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `num_serie` VARCHAR(255) NOT NULL,
+  `date_vente` DATETIME DEFAULT NULL,
+  `date_installation` DATETIME DEFAULT NULL,
+  `prix_vente` DECIMAL(10,2) DEFAULT NULL,
+  `emplacement` VARCHAR(255) DEFAULT NULL,
+  `client_id` INT NOT NULL,
+  `type_materiel_id` INT NOT NULL,
+  `contrat_maintenance_id` INT DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_18d2b09119eb6921` (`client_id`),
+  KEY `idx_18d2b0915d91dd3e` (`type_materiel_id`),
+  KEY `idx_18d2b09195269dc1` (`contrat_maintenance_id`),
+  CONSTRAINT `fk_18d2b09119eb6921` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`),
+  CONSTRAINT `fk_18d2b0915d91dd3e` FOREIGN KEY (`type_materiel_id`) REFERENCES `type_materiel` (`id`),
+  CONSTRAINT `fk_18d2b09195269dc1` FOREIGN KEY (`contrat_maintenance_id`) REFERENCES `contrat_maintenance` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `messenger_messages` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `body` LONGTEXT NOT NULL,
+  `headers` LONGTEXT NOT NULL,
+  `queue_name` VARCHAR(190) NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  `available_at` DATETIME NOT NULL,
+  `delivered_at` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_75ea56e016ba31db` (`delivered_at`),
+  KEY `idx_75ea56e0e3bd61ce` (`available_at`),
+  KEY `idx_75ea56e0fb7336f0` (`queue_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `controler` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `num_serie` VARCHAR(255) NOT NULL,
+  `num_intervenant` VARCHAR(255) NOT NULL,
+  `temps_passe` VARCHAR(255) DEFAULT NULL,
+  `commentaire` LONGTEXT DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `doctrine_migration_versions` (
+  `version` VARCHAR(191) NOT NULL,
+  `executed_at` DATETIME DEFAULT NULL,
+  `execution_time` INT DEFAULT NULL,
+  PRIMARY KEY (`version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `agence` (`id`,`num_agence`,`nom_agence`,`adresse_agence`,`tel_agence`) VALUES
+  (11,'AG001','Agence Paris Centre','15 Rue de la République, 75001 Paris',NULL),
+  (12,'AG002','Agence Lyon','8 Place Bellecour, 69002 Lyon',NULL);
+
+INSERT INTO `client` (`id`,`num_client`,`rais_sociale`,`siren`,`code_ape`,`adresse_client`,`telephone_client`,`email_client`,`duree_deplacement`,`distance_km`,`agence_id`) VALUES
+  (21,'CLI001','Boulangerie Martin',12345678901234,1071,'23 Rue du Pain, 75003 Paris',145678901,'contact@boulangerie-martin.fr','25',8.50,11),
+  (22,'CLI002','Pharmacie Centrale',98765432109876,4773,'45 Avenue de la Santé, 75014 Paris',156789012,'info@pharmacie-centrale.fr','15',5.20,11),
+  (23,'CLI003','Restaurant Le Gourmet',45678901234567,5610,'8 Place du Marché, 69001 Lyon',478901234,'reservation@legourmet.fr','40',15.00,12),
+  (24,'CLI004','Garage Dupuis',11223344556677,4520,'112 Route Nationale, 69003 Lyon',478112233,'contact@garage-dupuis.fr','30',12.30,12),
+  (25,'CLI005','Librairie Pages',99887766554433,4761,'5 Rue des Livres, 75005 Paris',143556677,'librairie@pages.fr','20',6.80,12);
+
+INSERT INTO `utilisateur` (`id`,`type_utilisateur`,`nom`,`prenom`,`email`,`roles`,`password`,`agence_id`,`matricule`) VALUES
+  (21,'technicien','Martin','Pierre','pierre.martin@cashcash.fr','["ROLE_TECH"]','$2y$13$nHUtzm9kMyiiX998KfFWWevlT2w5HuMsQkfl1kgwj.bnLMAA0fPTS',11,'TECH001'),
+  (22,'technicien','Dubois','Marie','marie.dubois@cashcash.fr','["ROLE_TECH"]','$2y$13$Sx1/rZJ8jIQqZaLr5MXQhOfadG2/FO1SbgWiLpCZzCemjjv.nHaJu',11,'TECH002'),
+  (23,'technicien','Bernard','Lucas','lucas.bernard@cashcash.fr','["ROLE_TECH"]','$2y$13$oIy4dLvW0htpPH0ck6EjAeQVr7FlvxeumbB7G9GSMtCV6e9e.RUP2',12,'TECH003'),
+  (24,'technicien','Petit','Emma','emma.petit@cashcash.fr','["ROLE_TECH"]','$2y$13$nf0WG6bGlwyw/lo.mwKZIeuNv6xcityxgXifk/ZnkrkJc6fq9FhG.',12,'TECH004'),
+  (25,'gestionnaire','Dupont','Jean','jean.dupont@cashcash.fr','["ROLE_ADMIN"]','$2y$13$5ffuyZk0YiXIKtwSXSjuaOI6wI/MypwJJGuvv3LsdROkuQe5ijbpi',11,'GEST001'),
+  (26,'gestionnaire','test','test','test@test.fr','["ROLE_USER","ROLE_GERANT"]','$2y$13$PFtpZdtRLj36zYrSR3FMZeCLdtD2wnPGIWbDBrV9ZCgMoc5QyeuKi',11,'test001'),
+  (27,'admin','Poulain','Lohan','lohan.poulain@cashcash.fr','["ROLE_USER","ROLE_ADMIN"]','$2y$13$TtxwhXxImHZWfiNrMo4kneP46.2ScpwUnswe8GFc.S/OSXPjxbhGC',12,'ADM001'),
+  (28,'admin','Dubois','Lucas','dubois.lucas@cashcash.fr','["ROLE_USER","ROLE_ADMIN"]','$2y$13$jtL/SkgL2r5JuaiKoDC60O0nuAnEsz5OCKWjuTl6esxvntNXDDGwe',11,'ADM002');
+
+INSERT INTO `intervention` (`id`,`date_visite`,`heure_visite`,`client_id`,`technicien_id`,`titre`,`description`,`statut`,`gravite`) VALUES
+  (28,'2026-03-05','09:00:00',21,23,NULL,NULL,'ouverte','moyenne'),
+  (29,'2026-03-05','14:30:00',22,21,NULL,NULL,'ouverte','moyenne'),
+  (30,'2026-03-06','10:00:00',23,23,NULL,NULL,'ouverte','moyenne'),
+  (31,'2026-03-07','11:00:00',24,21,NULL,NULL,'ouverte','moyenne'),
+  (32,'2026-03-07','15:00:00',25,24,NULL,NULL,'ouverte','moyenne'),
+  (33,'2026-03-08','09:30:00',21,22,NULL,NULL,'ouverte','moyenne'),
+  (34,'2026-03-10','08:00:00',22,23,NULL,NULL,'ouverte','moyenne'),
+  (35,'2026-03-10','16:00:00',23,21,NULL,NULL,'ouverte','moyenne'),
+  (36,'2026-03-11','10:30:00',24,21,'Intervention souris','Intervenant pour la souris','ouverte','moyenne');
+
+INSERT INTO `doctrine_migration_versions` (`version`,`executed_at`,`execution_time`) VALUES
+  ('DoctrineMigrations\\Version20251215145942','2026-03-16 09:10:02',312),
+  ('DoctrineMigrations\\Version20260316120000','2026-03-16 09:18:09',13),
+  ('DoctrineMigrations\\Version20260316121500','2026-03-16 09:19:24',30);
+
+ALTER TABLE `agence` AUTO_INCREMENT=13;
+ALTER TABLE `client` AUTO_INCREMENT=26;
+ALTER TABLE `utilisateur` AUTO_INCREMENT=29;
+ALTER TABLE `intervention` AUTO_INCREMENT=37;
+
+SET FOREIGN_KEY_CHECKS=1;
+
+/*
 \restrict 4seu0vGpDmqALvlnR6afL3rTbDGtTKH2noQDwYnHUMUgxFjun8S2soGD5eZhkHv
 
 -- Dumped from database version 16.13
--- Dumped by pg_dump version 16.13
+-- legacy dump metadata (removed)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
+-- legacy dump metadata (removed)
 SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
@@ -660,77 +866,77 @@ COPY public.utilisateur (id, type_utilisateur, nom, prenom, email, roles, passwo
 -- Name: agence_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.agence_id_seq', 12, true);
+-- legacy dump metadata (removed)
 
 
 --
 -- Name: client_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.client_id_seq', 25, true);
+-- legacy dump metadata (removed)
 
 
 --
 -- Name: contrat_maintenance_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.contrat_maintenance_id_seq', 1, false);
+-- legacy dump metadata (removed)
 
 
 --
 -- Name: controler_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.controler_id_seq', 1, false);
+-- legacy dump metadata (removed)
 
 
 --
 -- Name: famille_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.famille_id_seq', 1, false);
+-- legacy dump metadata (removed)
 
 
 --
 -- Name: intervention_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.intervention_id_seq', 36, true);
+-- legacy dump metadata (removed)
 
 
 --
 -- Name: materiel_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.materiel_id_seq', 1, false);
+-- legacy dump metadata (removed)
 
 
 --
 -- Name: messenger_messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.messenger_messages_id_seq', 1, false);
+-- legacy dump metadata (removed)
 
 
 --
 -- Name: type_contrat_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.type_contrat_id_seq', 1, false);
+-- legacy dump metadata (removed)
 
 
 --
 -- Name: type_materiel_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.type_materiel_id_seq', 1, false);
+-- legacy dump metadata (removed)
 
 
 --
 -- Name: utilisateur_id_seq; Type: SEQUENCE SET; Schema: public; Owner: app
 --
 
-SELECT pg_catalog.setval('public.utilisateur_id_seq', 28, true);
+-- legacy dump metadata (removed)
 
 
 --
@@ -985,8 +1191,6 @@ ALTER TABLE ONLY public.type_materiel
 
 
 --
--- PostgreSQL database dump complete
---
-
-\unrestrict 4seu0vGpDmqALvlnR6afL3rTbDGtTKH2noQDwYnHUMUgxFjun8S2soGD5eZhkHv
+-- Legacy dump end
+*/
 

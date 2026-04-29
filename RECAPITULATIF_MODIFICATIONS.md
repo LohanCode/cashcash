@@ -217,9 +217,10 @@ Le template utilisait les mauvais noms de propriétés pour l'entité `Utilisate
 - Design professionnel et sobre
 
 ### ⚠️ Prérequis
-- **MySQL/MariaDB** doit être démarré (via XAMPP)
-- Base de données `bdd_cashcash` créée
-- Fixtures chargées pour avoir des données
+- Docker Desktop démarré
+- `docker compose up -d database phpmyadmin`
+- Base de données `cashcash` disponible (MySQL Docker)
+- Migrations/fixtures chargées pour avoir des données
 
 ### 🔗 URLs disponibles
 | URL | Description |

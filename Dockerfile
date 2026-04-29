@@ -1,14 +1,13 @@
 FROM php:8.2-apache
 
-# 1. Installation des dépendances système et drivers PostgreSQL
+# 1. Installation des dépendances système et drivers MySQL
 RUN apt-get update && apt-get install -y \
     libicu-dev \
     libzip-dev \
     zip \
     unzip \
     libpng-dev \
-    libpq-dev \
-    && docker-php-ext-install intl pdo pdo_pgsql zip opcache gd
+    && docker-php-ext-install intl pdo_mysql zip opcache gd
 
 # 2. Configuration Apache (Gestion du /public et des réécritures d'URL)
 RUN a2enmod rewrite
