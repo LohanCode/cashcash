@@ -17,7 +17,7 @@ class TypeContrat
     private ?string $RefTypeContrat = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $DelailIntervention = null;
+    private ?string $DelaiIntervention = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $tauxApplicable = null;
@@ -39,14 +39,14 @@ class TypeContrat
         return $this;
     }
 
-    public function getDelailIntervention(): ?string
+    public function getDelaiIntervention(): ?string
     {
-        return $this->DelailIntervention;
+        return $this->DelaiIntervention;
     }
 
-    public function setDelailIntervention(?string $DelailIntervention): static
+    public function setDelaiIntervention(?string $DelaiIntervention): static
     {
-        $this->DelailIntervention = $DelailIntervention;
+        $this->DelaiIntervention = $DelaiIntervention;
 
         return $this;
     }

@@ -23,7 +23,7 @@ class ContratMaintenance
     private ?\DateTime $dateEcheance = null;
 
     #[ORM\ManyToOne(targetEntity: TypeContrat::class)]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?TypeContrat $typeContrat = null;
 
     public function getId(): ?int
