@@ -22,6 +22,10 @@ class ContratMaintenance
     #[ORM\Column(nullable: true)]
     private ?\DateTime $dateEcheance = null;
 
+    #[ORM\ManyToOne(targetEntity: TypeContrat::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?TypeContrat $typeContrat = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +63,18 @@ class ContratMaintenance
     public function setDateEcheance(?\DateTime $dateEcheance): static
     {
         $this->dateEcheance = $dateEcheance;
+
+        return $this;
+    }
+
+    public function getTypeContrat(): ?TypeContrat
+    {
+        return $this->typeContrat;
+    }
+
+    public function setTypeContrat(?TypeContrat $typeContrat): static
+    {
+        $this->typeContrat = $typeContrat;
 
         return $this;
     }

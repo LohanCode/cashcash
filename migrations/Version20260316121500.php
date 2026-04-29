@@ -17,7 +17,7 @@ final class Version20260316121500 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->abortIf(
-            $this->connection->getDatabasePlatform()->getName() !== 'mysql',
+            !($this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\MySQLPlatform),
             'This migration is intended for MySQL.'
         );
 
@@ -27,7 +27,7 @@ final class Version20260316121500 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->abortIf(
-            $this->connection->getDatabasePlatform()->getName() !== 'mysql',
+            !($this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\MySQLPlatform),
             'This migration is intended for MySQL.'
         );
 
