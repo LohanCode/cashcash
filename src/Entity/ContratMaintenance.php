@@ -26,6 +26,10 @@ class ContratMaintenance
     #[ORM\JoinColumn(nullable: false)]
     private ?TypeContrat $typeContrat = null;
 
+    #[ORM\ManyToOne(targetEntity: Materiel::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Materiel $materiel = null;
+
     public function getId(): ?int
     {
         return $this->id;

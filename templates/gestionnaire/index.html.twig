@@ -40,5 +40,94 @@
                 <i class="fas fa-user-cog"></i> Gérer
             </a>
         </div>
+
+        <div class="dashboard-card">
+            <i class="fas fa-file-export"></i>
+            <h2>Exports Clients</h2>
+            <p>Générez les fichiers XML et PDF de relance pour vos clients.</p>
+
+            <div style="margin: 1rem 0;">
+                <input type="text" id="clientSearch" placeholder="Numéro ou nom du client..." style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+                <button onclick="rechercherClient()" style="width: 100%; margin-top: 0.5rem; padding: 0.75rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Rechercher
+                </button>
+            </div>
+
+            <div id="clientResult" style="margin: 1rem 0; padding: 1rem; background: #f5f5f5; border-radius: 4px; display: none;">
+                <p><strong>Client trouvé:</strong> <span id="clientName"></span></p>
+                <p><strong>Numéro:</strong> <span id="clientNum"></span></p>
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <button onclick="genererXmlClient()" class="btn-dashboard" style="flex: 1; background: #27ae60;">
+                        <i class="fas fa-file-code"></i> XML
+                    </button>
+                    <button onclick="genererPdfClient()" class="btn-dashboard" style="flex: 1; background: #e74c3c;">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        let clientSelectionnee = null;
+
+        function rechercherClient() {
+            let search = document.getElementById('clientSearch').value.trim();
+            if (search === "") {
+                alert("Entrez un numéro ou nom de client");
+                return;
+            }
+
+            fetch(`http://localhost:9999/api/client/data?numClient=${encodeURIComponent(search)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert("❌ Client non trouvé: " + data.error);
+                        document.getElementById('clientResult').style.display = 'none';
+                    } else {
+                        clientSelectionnee = data;
+                        document.getElementById('clientName').textContent = data.raisSociale || "N/A";
+                        document.getElementById('clientNum').textContent = data.numClient || "N/A";
+                        document.getElementById('clientResult').style.display = 'block';
+                    }
+                })
+                .catch(e => alert("❌ Erreur: " + e.message));
+        }
+
+        function genererXmlClient() {
+            if (!clientSelectionnee) {
+                alert("Sélectionnez d'abord un client");
+                return;
+            }
+
+            fetch(`http://localhost:9999/api/client/xml?numClient=${encodeURIComponent(clientSelectionnee.numClient)}&filename=client_${encodeURIComponent(clientSelectionnee.numClient)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("✓ " + data.message + "\n📁 Fichier: " + data.filename);
+                    } else {
+                        alert("❌ Erreur: " + data.error);
+                    }
+                })
+                .catch(e => alert("❌ Erreur de connexion: " + e.message));
+        }
+
+        function genererPdfClient() {
+            if (!clientSelectionnee) {
+                alert("Sélectionnez d'abord un client");
+                return;
+            }
+
+            fetch(`http://localhost:9999/api/client/pdf?numClient=${encodeURIComponent(clientSelectionnee.numClient)}&filename=relance_${encodeURIComponent(clientSelectionnee.numClient)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("✓ " + data.message + "\n📁 Fichier: " + data.filename);
+                    } else {
+                        alert("❌ Erreur: " + data.error);
+                    }
+                })
+                .catch(e => alert("❌ Erreur de connexion: " + e.message));
+        }
+    </script>
 {% endblock %}
