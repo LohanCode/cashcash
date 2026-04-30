@@ -71,16 +71,22 @@
     <script>
         let clientSelectionnee = null;
 
-        // Afficher la carte "Exports" seulement si c'est le client lourd
+        // Afficher la carte "Exports" seulement si c'est le client lourd (JavaFX)
+        // Utilise un polling car le bridge Java est injecté légèrement après le chargement du DOM.
         function detecterClientLourd() {
-            // Si le serveur API local est accessible, on est sur le client lourd
-            fetch('http://localhost:9999/api/client/data?numClient=test', { method: 'GET' })
-                .then(() => {
+            let tentatives = 0;
+            const verifier = setInterval(function() {
+                tentatives++;
+                if (window.javaApplication) {
+                    // Bridge Java trouvé -> on est dans le client lourd
                     document.getElementById('exportsCard').style.display = 'block';
-                })
-                .catch(() => {
+                    clearInterval(verifier);
+                } else if (tentatives >= 10) {
+                    // Après 5 secondes sans bridge -> client léger, on arrête
                     document.getElementById('exportsCard').style.display = 'none';
-                });
+                    clearInterval(verifier);
+                }
+            }, 500);
         }
 
         // Appeler au chargement
@@ -121,7 +127,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert("✓ " + data.message + "\n📁 " + data.filename);
+                        alert("✓ " + data.message + "\n📁 Fichier: " + data.filename + "\n📂 Chemin: " + data.path);
                     } else {
                         alert("❌ Erreur: " + data.error);
                     }
@@ -141,7 +147,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert("✓ " + data.message + "\n📁 " + data.filename);
+                        alert("✓ " + data.message + "\n📁 Fichier: " + data.filename + "\n📂 Chemin: " + data.path);
                     } else {
                         alert("❌ Erreur: " + data.error);
                     }

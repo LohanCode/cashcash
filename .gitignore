@@ -29,3 +29,6 @@
 /ClientLourd/*.exe
 /ClientLourd/*.blockmap
 /ClientLourd/*.7z
+
+# Maven build artifacts (Java)
+/ClientLourd/target/

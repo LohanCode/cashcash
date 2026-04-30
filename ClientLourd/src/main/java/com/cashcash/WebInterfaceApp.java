@@ -36,8 +36,12 @@ public class WebInterfaceApp extends Application {
             WebView webView = new WebView();
             webEngine = webView.getEngine();
 
-            // Configuration du WebEngine
-            webEngine.setJavaScriptEnabled(true);
+            // Injection automatique du bridge à chaque chargement de page
+            webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+                if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+                    injectBridge();
+                }
+            });
 
             // Charger la page HTML
             loadWebInterface();
@@ -69,10 +73,8 @@ public class WebInterfaceApp extends Application {
      */
     private void loadWebInterface() {
         try {
-            // Exposer le bridge Java au JavaScript
-            com.cashcash.web.JavaScriptBridge bridge = new com.cashcash.web.JavaScriptBridge();
-            JSObject jsObject = (JSObject) webEngine.executeScript("window");
-            jsObject.setMember("javaApplication", bridge);
+            // Premier essai d'injection (sera répété par le listener au chargement complet)
+            injectBridge();
 
             // Mode 1 : Charger via serveur Symfony local
             String localServerUrl = "http://localhost:8000/";
@@ -104,6 +106,23 @@ public class WebInterfaceApp extends Application {
 
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erreur lors du chargement de l'interface web", e);
+        }
+    }
+
+    /**
+     * Injecte le bridge Java dans le contexte JavaScript de la page.
+     */
+    private void injectBridge() {
+        try {
+            JSObject jsObject = (JSObject) webEngine.executeScript("window");
+            com.cashcash.web.JavaScriptBridge bridge = new com.cashcash.web.JavaScriptBridge();
+            jsObject.setMember("javaApplication", bridge);
+            // Re-déclencher la détection depuis Java une fois le bridge injecté
+            webEngine.executeScript("if (typeof detecterClientLourd === 'function') { detecterClientLourd(); }");
+            LOGGER.info("Bridge Java injecté dans la page");
+        } catch (Exception e) {
+            // Peut échouer si aucune page n'est chargée, c'est normal au tout début
+            LOGGER.fine("Bridge non injecté (page non prête)");
         }
     }
 
