@@ -118,15 +118,13 @@
             let url = `http://localhost:9999/api/client/xml?numClient=${encodeURIComponent(clientSelectionnee.numClient)}&filename=client_${encodeURIComponent(clientSelectionnee.numClient)}`;
 
             fetch(url)
-                .then(response => response.blob())
-                .then(blob => {
-                    let link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = `client_${clientSelectionnee.numClient}.xml`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    window.URL.revokeObjectURL(link.href);
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("✓ " + data.message + "\n📁 Fichier: " + data.filename + "\n📂 Chemin: " + data.path);
+                    } else {
+                        alert("❌ Erreur: " + data.error);
+                    }
                 })
                 .catch(e => alert("❌ Erreur: " + e.message));
         }
@@ -140,15 +138,13 @@
             let url = `http://localhost:9999/api/client/pdf?numClient=${encodeURIComponent(clientSelectionnee.numClient)}&filename=relance_${encodeURIComponent(clientSelectionnee.numClient)}`;
 
             fetch(url)
-                .then(response => response.blob())
-                .then(blob => {
-                    let link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = `relance_${clientSelectionnee.numClient}.pdf`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    window.URL.revokeObjectURL(link.href);
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("✓ " + data.message + "\n📁 Fichier: " + data.filename + "\n📂 Chemin: " + data.path);
+                    } else {
+                        alert("❌ Erreur: " + data.error);
+                    }
                 })
                 .catch(e => alert("❌ Erreur: " + e.message));
         }

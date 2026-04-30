@@ -41,8 +41,9 @@ class Materiel
     #[ORM\JoinColumn(nullable: false)]
     private ?TypeMateriel $typeMateriel = null;
 
-    // 3. Relation ManyToOne avec ContratMaintenance (peut être NULL)
+    // 3. Relation ManyToOne avec ContratMaintenance
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
     private ?ContratMaintenance $contratMaintenance = null;
 
     // 4. Relation avec la table de jointure Controler non mappée par Doctrine car l'inverse n'existe pas

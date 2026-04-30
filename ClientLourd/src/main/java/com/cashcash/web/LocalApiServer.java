@@ -56,7 +56,15 @@ public class LocalApiServer {
                     // Servir le fichier en téléchargement
                     byte[] xmlData = baos.toByteArray();
                     String xmlFilename = (filename.isEmpty() ? "client" : filename) + ".xml";
-                    sendFileDownload(exchange, xmlData, xmlFilename, "application/xml");
+
+                    // Sauvegarder directement dans Téléchargements
+                    String downloadsDir = System.getProperty("user.home") + File.separator + "Downloads";
+                    File downloadFile = new File(downloadsDir, xmlFilename);
+                    downloadFile.getParentFile().mkdirs();
+                    java.nio.file.Files.write(downloadFile.toPath(), xmlData);
+                    LOGGER.info("✓ Fichier XML généré: " + downloadFile.getAbsolutePath());
+
+                    sendJsonResponse(exchange, "{\"success\": true, \"message\": \"XML généré avec succès\", \"path\": \"" + downloadFile.getAbsolutePath() + "\", \"filename\": \"" + xmlFilename + "\"}");
 
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Erreur API XML", e);
@@ -126,7 +134,15 @@ public class LocalApiServer {
                     // Servir le fichier en téléchargement
                     byte[] pdfData = baos.toByteArray();
                     String pdfFilename = (filename.isEmpty() ? "relance" : filename) + ".pdf";
-                    sendFileDownload(exchange, pdfData, pdfFilename, "application/pdf");
+
+                    // Sauvegarder directement dans Téléchargements
+                    String downloadsDir = System.getProperty("user.home") + File.separator + "Downloads";
+                    File downloadFile = new File(downloadsDir, pdfFilename);
+                    downloadFile.getParentFile().mkdirs();
+                    java.nio.file.Files.write(downloadFile.toPath(), pdfData);
+                    LOGGER.info("✓ Fichier PDF généré: " + downloadFile.getAbsolutePath());
+
+                    sendJsonResponse(exchange, "{\"success\": true, \"message\": \"PDF généré avec succès\", \"path\": \"" + downloadFile.getAbsolutePath() + "\", \"filename\": \"" + pdfFilename + "\"}");
 
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Erreur API PDF", e);
