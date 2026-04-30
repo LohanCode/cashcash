@@ -4,7 +4,7 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -33,12 +33,35 @@ public class LocalApiServer {
                     String numClient = extractParam(query, "numClient");
                     String filename = extractParam(query, "filename");
 
-                    String result = bridge.generateClientXml(numClient, filename);
-                    sendResponse(exchange, result);
+                    // Générer le XML en mémoire
+                    com.cashcash.models.Client client = new com.cashcash.database.ClientDao().getClientByNum(numClient);
+                    if (client == null) {
+                        sendJsonResponse(exchange, "{\"error\": \"Client not found\"}");
+                        return;
+                    }
+
+                    // Générer le XML en ByteArrayOutputStream
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        javax.xml.bind.JAXBContext context = javax.xml.bind.JAXBContext.newInstance(com.cashcash.models.Client.class);
+                        javax.xml.bind.Marshaller marshaller = context.createMarshaller();
+                        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+                        marshaller.marshal(client, baos);
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Erreur JAXB", e);
+                        sendJsonResponse(exchange, "{\"error\": \"XML generation failed\"}");
+                        return;
+                    }
+
+                    // Servir le fichier en téléchargement
+                    byte[] xmlData = baos.toByteArray();
+                    String xmlFilename = (filename.isEmpty() ? "client" : filename) + ".xml";
+                    sendFileDownload(exchange, xmlData, xmlFilename, "application/xml");
+
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Erreur API XML", e);
                     try {
-                        sendResponse(exchange, "{\"error\": \"" + e.getMessage() + "\"}");
+                        sendJsonResponse(exchange, "{\"error\": \"" + e.getMessage() + "\"}");
                     } catch (Exception ex) {
                         LOGGER.log(Level.SEVERE, "Erreur envoi réponse", ex);
                     }
@@ -54,12 +77,61 @@ public class LocalApiServer {
                     String numClient = extractParam(query, "numClient");
                     String filename = extractParam(query, "filename");
 
-                    String result = bridge.generateClientPdf(numClient, filename);
-                    sendResponse(exchange, result);
+                    // Récupérer le client
+                    com.cashcash.models.Client client = new com.cashcash.database.ClientDao().getClientByNum(numClient);
+                    if (client == null) {
+                        sendJsonResponse(exchange, "{\"error\": \"Client not found\"}");
+                        return;
+                    }
+
+                    // Générer le PDF en ByteArrayOutputStream
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        com.itextpdf.text.Document document = new com.itextpdf.text.Document();
+                        com.itextpdf.text.pdf.PdfWriter.getInstance(document, baos);
+                        document.open();
+
+                        com.itextpdf.text.Font titleFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 18, com.itextpdf.text.Font.BOLD);
+                        com.itextpdf.text.Font regularFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.NORMAL);
+
+                        com.itextpdf.text.Paragraph titre = new com.itextpdf.text.Paragraph("Lettre de relance de maintenance", titleFont);
+                        titre.setAlignment(com.itextpdf.text.Paragraph.ALIGN_CENTER);
+                        document.add(titre);
+                        document.add(new com.itextpdf.text.Paragraph(" "));
+
+                        document.add(new com.itextpdf.text.Paragraph("À l'attention de : " + client.getRaisSociale(), regularFont));
+                        document.add(new com.itextpdf.text.Paragraph("Adresse : " + client.getAdresseClient(), regularFont));
+                        document.add(new com.itextpdf.text.Paragraph("Téléphone : " + client.getTelephoneClient(), regularFont));
+                        document.add(new com.itextpdf.text.Paragraph(" "));
+
+                        document.add(new com.itextpdf.text.Paragraph("Madame, Monsieur,", regularFont));
+                        document.add(new com.itextpdf.text.Paragraph("Nous vous prions de bien vouloir trouver ci-dessous la liste de vos matériels nécessitant une visite de maintenance.", regularFont));
+                        document.add(new com.itextpdf.text.Paragraph(" "));
+
+                        for (com.cashcash.models.Materiel m : client.getMateriels()) {
+                            document.add(new com.itextpdf.text.Paragraph("- Matériel NS: " + m.getNumSerie() + " (Emplacement: " + m.getEmplacement() + ")", regularFont));
+                        }
+
+                        document.add(new com.itextpdf.text.Paragraph(" "));
+                        document.add(new com.itextpdf.text.Paragraph("Dans l'attente de votre retour, nous vous prions d'agréer nos salutations distinguées.", regularFont));
+                        document.add(new com.itextpdf.text.Paragraph("L'équipe CashCash.", regularFont));
+
+                        document.close();
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Erreur iText", e);
+                        sendJsonResponse(exchange, "{\"error\": \"PDF generation failed\"}");
+                        return;
+                    }
+
+                    // Servir le fichier en téléchargement
+                    byte[] pdfData = baos.toByteArray();
+                    String pdfFilename = (filename.isEmpty() ? "relance" : filename) + ".pdf";
+                    sendFileDownload(exchange, pdfData, pdfFilename, "application/pdf");
+
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Erreur API PDF", e);
                     try {
-                        sendResponse(exchange, "{\"error\": \"" + e.getMessage() + "\"}");
+                        sendJsonResponse(exchange, "{\"error\": \"" + e.getMessage() + "\"}");
                     } catch (Exception ex) {
                         LOGGER.log(Level.SEVERE, "Erreur envoi réponse", ex);
                     }
@@ -75,11 +147,11 @@ public class LocalApiServer {
                     String numClient = extractParam(query, "numClient");
 
                     String result = bridge.getClientData(numClient);
-                    sendResponse(exchange, result);
+                    sendJsonResponse(exchange, result);
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Erreur API data", e);
                     try {
-                        sendResponse(exchange, "{\"error\": \"" + e.getMessage() + "\"}");
+                        sendJsonResponse(exchange, "{\"error\": \"" + e.getMessage() + "\"}");
                     } catch (Exception ex) {
                         LOGGER.log(Level.SEVERE, "Erreur envoi réponse", ex);
                     }
@@ -115,7 +187,21 @@ public class LocalApiServer {
         return "";
     }
 
-    private void sendResponse(HttpExchange exchange, String response) throws Exception {
+    private void sendFileDownload(HttpExchange exchange, byte[] data, String filename, String contentType) throws Exception {
+        exchange.getResponseHeaders().set("Content-Type", "application/octet-stream");
+        exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+        exchange.getResponseHeaders().set("Content-Length", String.valueOf(data.length));
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().set("Cache-Control", "no-cache, no-store, must-revalidate");
+        exchange.getResponseHeaders().set("Pragma", "no-cache");
+        exchange.getResponseHeaders().set("Expires", "0");
+        exchange.sendResponseHeaders(200, data.length);
+        OutputStream os = exchange.getResponseBody();
+        os.write(data);
+        os.close();
+    }
+
+    private void sendJsonResponse(HttpExchange exchange, String response) throws Exception {
         exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
         exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
         exchange.sendResponseHeaders(200, response.getBytes().length);
@@ -124,3 +210,4 @@ public class LocalApiServer {
         os.close();
     }
 }
+

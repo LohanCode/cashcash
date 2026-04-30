@@ -41,7 +41,7 @@
             </a>
         </div>
 
-        <div class="dashboard-card">
+        <div class="dashboard-card" id="exportsCard" style="display: none;">
             <i class="fas fa-file-export"></i>
             <h2>Exports Clients</h2>
             <p>Générez les fichiers XML et PDF de relance pour vos clients.</p>
@@ -70,6 +70,21 @@
 
     <script>
         let clientSelectionnee = null;
+
+        // Afficher la carte "Exports" seulement si c'est le client lourd
+        function detecterClientLourd() {
+            // Si le serveur API local est accessible, on est sur le client lourd
+            fetch('http://localhost:9999/api/client/data?numClient=test', { method: 'GET' })
+                .then(() => {
+                    document.getElementById('exportsCard').style.display = 'block';
+                })
+                .catch(() => {
+                    document.getElementById('exportsCard').style.display = 'none';
+                });
+        }
+
+        // Appeler au chargement
+        window.addEventListener('DOMContentLoaded', detecterClientLourd);
 
         function rechercherClient() {
             let search = document.getElementById('clientSearch').value.trim();
@@ -100,16 +115,20 @@
                 return;
             }
 
-            fetch(`http://localhost:9999/api/client/xml?numClient=${encodeURIComponent(clientSelectionnee.numClient)}&filename=client_${encodeURIComponent(clientSelectionnee.numClient)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert("✓ " + data.message + "\n📁 Fichier: " + data.filename);
-                    } else {
-                        alert("❌ Erreur: " + data.error);
-                    }
+            let url = `http://localhost:9999/api/client/xml?numClient=${encodeURIComponent(clientSelectionnee.numClient)}&filename=client_${encodeURIComponent(clientSelectionnee.numClient)}`;
+
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    let link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = `client_${clientSelectionnee.numClient}.xml`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(link.href);
                 })
-                .catch(e => alert("❌ Erreur de connexion: " + e.message));
+                .catch(e => alert("❌ Erreur: " + e.message));
         }
 
         function genererPdfClient() {
@@ -118,16 +137,20 @@
                 return;
             }
 
-            fetch(`http://localhost:9999/api/client/pdf?numClient=${encodeURIComponent(clientSelectionnee.numClient)}&filename=relance_${encodeURIComponent(clientSelectionnee.numClient)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert("✓ " + data.message + "\n📁 Fichier: " + data.filename);
-                    } else {
-                        alert("❌ Erreur: " + data.error);
-                    }
+            let url = `http://localhost:9999/api/client/pdf?numClient=${encodeURIComponent(clientSelectionnee.numClient)}&filename=relance_${encodeURIComponent(clientSelectionnee.numClient)}`;
+
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    let link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = `relance_${clientSelectionnee.numClient}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(link.href);
                 })
-                .catch(e => alert("❌ Erreur de connexion: " + e.message));
+                .catch(e => alert("❌ Erreur: " + e.message));
         }
     </script>
 {% endblock %}

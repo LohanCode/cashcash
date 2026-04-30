@@ -80,86 +80,101 @@ public class JavaScriptBridge {
     }
 
     /**
-     * Génère un fichier XML pour un client.
+     * Génère un fichier XML pour un client (EN MÉMOIRE).
      * @param numClient le numéro du client
      * @param filename le nom du fichier de sortie
-     * @return "success" si OK, sinon un message d'erreur JSON
+     * @return le contenu XML en String
      */
-    public String generateClientXml(String numClient, String filename) {
+    public String generateClientXmlData(String numClient) {
         try {
             if (numClient == null || numClient.trim().isEmpty()) {
-                LOGGER.warning("NumClient vide fourni à generateClientXml");
-                return "{\"error\": \"NumClient invalide\"}";
+                LOGGER.warning("NumClient vide fourni à generateClientXmlData");
+                return null;
             }
 
-            // Récupérer les données du client
             com.cashcash.database.ClientDao clientDao = new com.cashcash.database.ClientDao();
             com.cashcash.models.Client client = clientDao.getClientByNum(numClient);
 
             if (client == null) {
                 LOGGER.warning("Client non trouvé pour XML : " + numClient);
-                return "{\"error\": \"Client introuvable\"}";
+                return null;
             }
 
-            // Valider le nom de fichier
-            String safeFilename = filename.replaceAll("[^a-zA-Z0-9._-]", "_");
-            if (!safeFilename.endsWith(".xml")) {
-                safeFilename += ".xml";
-            }
+            // Générer XML en ByteArrayOutputStream (ne pas sauvegarder)
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            javax.xml.bind.JAXBContext context = javax.xml.bind.JAXBContext.newInstance(com.cashcash.models.Client.class);
+            javax.xml.bind.Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(client, baos);
 
-            // Générer le XML
-            XmlGenerator.generateXml(client, safeFilename);
-            LOGGER.info("Fichier XML généré avec succès : " + safeFilename);
-            return "{\"success\": true, \"filename\": \"" + safeFilename + "\", \"message\": \"XML généré avec succès\"}";
+            LOGGER.info("XML généré en mémoire pour : " + numClient);
+            return baos.toString("UTF-8");
 
-        } catch (javax.xml.bind.JAXBException e) {
-            LOGGER.log(Level.SEVERE, "Erreur JAXB lors de la génération du XML", e);
-            return "{\"error\": \"Erreur lors de la sérialisation XML\"}";
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erreur lors de la génération du XML", e);
-            return "{\"error\": \"Erreur serveur lors de la génération du XML\"}";
+            return null;
         }
     }
 
     /**
-     * Génère un fichier PDF de relance pour un client.
+     * Génère un fichier PDF pour un client (EN MÉMOIRE).
      * @param numClient le numéro du client
-     * @param filename le nom du fichier de sortie
-     * @return "success" si OK, sinon un message d'erreur JSON
+     * @return le contenu PDF en ByteArray
      */
-    public String generateClientPdf(String numClient, String filename) {
+    public byte[] generateClientPdfData(String numClient) {
         try {
             if (numClient == null || numClient.trim().isEmpty()) {
-                LOGGER.warning("NumClient vide fourni à generateClientPdf");
-                return "{\"error\": \"NumClient invalide\"}";
+                LOGGER.warning("NumClient vide fourni à generateClientPdfData");
+                return null;
             }
 
-            // Récupérer les données du client
             com.cashcash.database.ClientDao clientDao = new com.cashcash.database.ClientDao();
             com.cashcash.models.Client client = clientDao.getClientByNum(numClient);
 
             if (client == null) {
                 LOGGER.warning("Client non trouvé pour PDF : " + numClient);
-                return "{\"error\": \"Client introuvable\"}";
+                return null;
             }
 
-            // Valider le nom de fichier
-            String safeFilename = filename.replaceAll("[^a-zA-Z0-9._-]", "_");
-            if (!safeFilename.endsWith(".pdf")) {
-                safeFilename += ".pdf";
+            // Générer PDF en ByteArrayOutputStream (ne pas sauvegarder)
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            com.itextpdf.text.Document document = new com.itextpdf.text.Document();
+            com.itextpdf.text.pdf.PdfWriter.getInstance(document, baos);
+            document.open();
+
+            com.itextpdf.text.Font titleFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 18, com.itextpdf.text.Font.BOLD);
+            com.itextpdf.text.Font regularFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.NORMAL);
+
+            com.itextpdf.text.Paragraph titre = new com.itextpdf.text.Paragraph("Lettre de relance de maintenance", titleFont);
+            titre.setAlignment(com.itextpdf.text.Paragraph.ALIGN_CENTER);
+            document.add(titre);
+            document.add(new com.itextpdf.text.Paragraph(" "));
+
+            document.add(new com.itextpdf.text.Paragraph("À l'attention de : " + client.getRaisSociale(), regularFont));
+            document.add(new com.itextpdf.text.Paragraph("Adresse : " + client.getAdresseClient(), regularFont));
+            document.add(new com.itextpdf.text.Paragraph("Téléphone : " + client.getTelephoneClient(), regularFont));
+            document.add(new com.itextpdf.text.Paragraph(" "));
+
+            document.add(new com.itextpdf.text.Paragraph("Madame, Monsieur,", regularFont));
+            document.add(new com.itextpdf.text.Paragraph("Nous vous prions de bien vouloir trouver ci-dessous la liste de vos matériels nécessitant une visite de maintenance.", regularFont));
+            document.add(new com.itextpdf.text.Paragraph(" "));
+
+            for (com.cashcash.models.Materiel m : client.getMateriels()) {
+                document.add(new com.itextpdf.text.Paragraph("- Matériel NS: " + m.getNumSerie() + " (Emplacement: " + m.getEmplacement() + ")", regularFont));
             }
 
-            // Générer le PDF
-            PdfGenerator.generatePdf(client, safeFilename);
-            LOGGER.info("Fichier PDF généré avec succès : " + safeFilename);
-            return "{\"success\": true, \"filename\": \"" + safeFilename + "\", \"message\": \"PDF généré avec succès\"}";
+            document.add(new com.itextpdf.text.Paragraph(" "));
+            document.add(new com.itextpdf.text.Paragraph("Dans l'attente de votre retour, nous vous prions d'agréer nos salutations distinguées.", regularFont));
+            document.add(new com.itextpdf.text.Paragraph("L'équipe CashCash.", regularFont));
 
-        } catch (com.itextpdf.text.DocumentException e) {
-            LOGGER.log(Level.SEVERE, "Erreur iText lors de la génération du PDF", e);
-            return "{\"error\": \"Erreur lors de la génération du document PDF\"}";
+            document.close();
+
+            LOGGER.info("PDF généré en mémoire pour : " + numClient);
+            return baos.toByteArray();
+
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erreur lors de la génération du PDF", e);
-            return "{\"error\": \"Erreur serveur lors de la génération du PDF\"}";
+            return null;
         }
     }
 }
