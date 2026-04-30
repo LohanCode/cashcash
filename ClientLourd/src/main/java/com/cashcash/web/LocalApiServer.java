@@ -24,6 +24,16 @@ public class LocalApiServer {
 
     public void start() throws Exception {
         server = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);
+        server.setExecutor(null);
+
+        // Permettre la réutilisation du port
+        try {
+            java.net.ServerSocket testSocket = new java.net.ServerSocket();
+            testSocket.setReuseAddress(true);
+            testSocket.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Erreur SO_REUSEADDR", e);
+        }
 
         server.createContext("/api/client/xml", new HttpHandler() {
             @Override
@@ -53,18 +63,18 @@ public class LocalApiServer {
                         return;
                     }
 
-                    // Servir le fichier en téléchargement
                     byte[] xmlData = baos.toByteArray();
                     String xmlFilename = (filename.isEmpty() ? "client" : filename) + ".xml";
 
-                    // Sauvegarder directement dans Téléchargements
+                    // Sauvegarder dans Téléchargements et ouvrir le fichier
                     String downloadsDir = System.getProperty("user.home") + File.separator + "Downloads";
                     File downloadFile = new File(downloadsDir, xmlFilename);
                     downloadFile.getParentFile().mkdirs();
                     java.nio.file.Files.write(downloadFile.toPath(), xmlData);
-                    LOGGER.info("✓ Fichier XML généré: " + downloadFile.getAbsolutePath());
 
-                    sendJsonResponse(exchange, "{\"success\": true, \"message\": \"XML généré avec succès\", \"path\": \"" + downloadFile.getAbsolutePath() + "\", \"filename\": \"" + xmlFilename + "\"}");
+                    openFile(downloadFile);
+                    sendJsonResponse(exchange, "{\"success\": true, \"message\": \"✓ Fichier XML généré et ouvert\", \"filename\": \"" + xmlFilename + "\", \"path\": \"" + downloadFile.getAbsolutePath() + "\"}");
+                    LOGGER.info("✓ Fichier XML généré: " + downloadFile.getAbsolutePath());
 
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Erreur API XML", e);
@@ -131,18 +141,18 @@ public class LocalApiServer {
                         return;
                     }
 
-                    // Servir le fichier en téléchargement
                     byte[] pdfData = baos.toByteArray();
                     String pdfFilename = (filename.isEmpty() ? "relance" : filename) + ".pdf";
 
-                    // Sauvegarder directement dans Téléchargements
+                    // Sauvegarder dans Téléchargements et ouvrir le fichier
                     String downloadsDir = System.getProperty("user.home") + File.separator + "Downloads";
                     File downloadFile = new File(downloadsDir, pdfFilename);
                     downloadFile.getParentFile().mkdirs();
                     java.nio.file.Files.write(downloadFile.toPath(), pdfData);
-                    LOGGER.info("✓ Fichier PDF généré: " + downloadFile.getAbsolutePath());
 
-                    sendJsonResponse(exchange, "{\"success\": true, \"message\": \"PDF généré avec succès\", \"path\": \"" + downloadFile.getAbsolutePath() + "\", \"filename\": \"" + pdfFilename + "\"}");
+                    openFile(downloadFile);
+                    sendJsonResponse(exchange, "{\"success\": true, \"message\": \"✓ Fichier PDF généré et ouvert\", \"filename\": \"" + pdfFilename + "\", \"path\": \"" + downloadFile.getAbsolutePath() + "\"}");
+                    LOGGER.info("✓ Fichier PDF généré: " + downloadFile.getAbsolutePath());
 
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Erreur API PDF", e);
@@ -175,7 +185,6 @@ public class LocalApiServer {
             }
         });
 
-        server.setExecutor(null);
         server.start();
         LOGGER.info("Serveur API local démarré sur http://localhost:" + PORT);
     }
@@ -224,6 +233,20 @@ public class LocalApiServer {
         OutputStream os = exchange.getResponseBody();
         os.write(response.getBytes());
         os.close();
+    }
+
+    private void openFile(File file) {
+        try {
+            if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", file.getAbsolutePath()});
+            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                Runtime.getRuntime().exec(new String[]{"open", file.getAbsolutePath()});
+            } else {
+                Runtime.getRuntime().exec(new String[]{"xdg-open", file.getAbsolutePath()});
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Impossible d'ouvrir le fichier automatiquement", e);
+        }
     }
 }
 

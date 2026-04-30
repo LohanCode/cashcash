@@ -39,31 +39,6 @@ public class WebInterfaceApp extends Application {
             // Configuration du WebEngine
             webEngine.setJavaScriptEnabled(true);
 
-            // Configurer le gestionnaire de téléchargement
-            webEngine.setDownloadHandler(downloadEvent -> {
-                try {
-                    String filename = downloadEvent.getFilename();
-                    String downloadsDir = System.getProperty("user.home") + File.separator + "Downloads";
-                    File downloadFile = new File(downloadsDir, filename);
-
-                    LOGGER.info("Téléchargement: " + downloadFile.getAbsolutePath());
-
-                    // Créer le dossier Téléchargements s'il n'existe pas
-                    downloadFile.getParentFile().mkdirs();
-
-                    // Télécharger le fichier
-                    java.nio.file.Files.copy(
-                            downloadEvent.getInputStream(),
-                            downloadFile.toPath(),
-                            java.nio.file.StandardCopyOption.REPLACE_EXISTING
-                    );
-
-                    LOGGER.info("Fichier téléchargé: " + downloadFile.getAbsolutePath());
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Erreur téléchargement", e);
-                }
-            });
-
             // Charger la page HTML
             loadWebInterface();
 

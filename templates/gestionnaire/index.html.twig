@@ -121,7 +121,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert("✓ " + data.message + "\n📁 Fichier: " + data.filename + "\n📂 Chemin: " + data.path);
+                        alert("✓ " + data.message + "\n📁 " + data.filename);
                     } else {
                         alert("❌ Erreur: " + data.error);
                     }
@@ -141,7 +141,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert("✓ " + data.message + "\n📁 Fichier: " + data.filename + "\n📂 Chemin: " + data.path);
+                        alert("✓ " + data.message + "\n📁 " + data.filename);
                     } else {
                         alert("❌ Erreur: " + data.error);
                     }
