@@ -22,6 +22,7 @@ public class ClientDao {
 
     /**
      * Recherche un client par son NumClient et charge ses matériels.
+     * 
      * @param numClient l'identifiant métier du client
      * @return un objet Client rempli, ou null si introuvable
      */
@@ -61,7 +62,8 @@ public class ClientDao {
                         chargerMateriels(client, conn);
                         LOGGER.info("Client " + numClient + " chargé avec succès");
                     } catch (NumberFormatException e) {
-                        LOGGER.log(Level.SEVERE, "Erreur de conversion de type lors du chargement du client " + numClient, e);
+                        LOGGER.log(Level.SEVERE,
+                                "Erreur de conversion de type lors du chargement du client " + numClient, e);
                         return null;
                     }
                 } else {
@@ -108,12 +110,13 @@ public class ClientDao {
 
     /**
      * Charge les contrats de maintenance d'un matériel.
+     * 
      * @param materiel le matériel dont on veut charger les contrats
-     * @param conn la connexion à la base de données
+     * @param conn     la connexion à la base de données
      */
     private void chargerContratsMaintenanceParMateriel(Materiel materiel, Connection conn) {
         String query = "SELECT cm.* FROM contrat_maintenance cm " +
-                       "WHERE cm.materiel_id = ? ORDER BY cm.date_echeance DESC";
+                "WHERE cm.materiel_id = ? ORDER BY cm.date_echeance DESC";
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setInt(1, materiel.getId());
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -142,7 +145,11 @@ public class ClientDao {
                             LOGGER.log(Level.WARNING, "Format de date invalide pour date_echeance", e);
                         }
 
-                        LOGGER.fine("Contrat " + contrat.getNumContrat() + " chargé pour le matériel " + materiel.getId());
+                        // Ajout du contrat au matériel
+                        materiel.addContrat(contrat);
+
+                        LOGGER.fine(
+                                "Contrat " + contrat.getNumContrat() + " chargé pour le matériel " + materiel.getId());
                     } catch (Exception e) {
                         LOGGER.log(Level.WARNING, "Erreur lors du chargement d'un contrat de maintenance", e);
                         continue;

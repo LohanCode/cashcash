@@ -24,7 +24,7 @@ public class Client {
     private String emailClient;
     private String dureeDeplacement;
     private double distanceKm;
-    
+
     private List<Materiel> materiels;
 
     /**

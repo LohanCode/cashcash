@@ -1,0 +1,24 @@
+-classpath
+'C:/Users/lohan/.m2/repository/org/openjfx/javafx-controls/17.0.6/javafx-controls-17.0.6-win.jar;C:/Users/lohan/.m2/repository/org/openjfx/javafx-graphics/17.0.6/javafx-graphics-17.0.6.jar;C:/Users/lohan/.m2/repository/org/openjfx/javafx-fxml/17.0.6/javafx-fxml-17.0.6-win.jar;C:/Users/lohan/.m2/repository/org/openjfx/javafx-controls/17.0.6/javafx-controls-17.0.6.jar;C:/Users/lohan/.m2/repository/org/openjfx/javafx-web/17.0.6/javafx-web-17.0.6-win.jar;C:/Users/lohan/.m2/repository/org/openjfx/javafx-media/17.0.6/javafx-media-17.0.6.jar;C:/Users/lohan/.m2/repository/org/openjfx/javafx-media/17.0.6/javafx-media-17.0.6-win.jar;C:/Users/lohan/.m2/repository/org/openjfx/javafx-graphics/17.0.6/javafx-graphics-17.0.6-win.jar;C:/Users/lohan/.m2/repository/org/openjfx/javafx-base/17.0.6/javafx-base-17.0.6.jar;C:/Users/lohan/.m2/repository/org/openjfx/javafx-base/17.0.6/javafx-base-17.0.6-win.jar;C:/Users/lohan/.m2/repository/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar;C:/Users/lohan/.m2/repository/com/google/protobuf/protobuf-java/3.21.9/protobuf-java-3.21.9.jar;C:/Users/lohan/.m2/repository/com/itextpdf/itextpdf/5.5.13.3/itextpdf-5.5.13.3.jar;C:/Users/lohan/.m2/repository/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar;C:/Users/lohan/.m2/repository/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0.jar;C:/Users/lohan/.m2/repository/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar;C:/Users/lohan/.m2/repository/org/glassfish/jaxb/txw2/2.3.1/txw2-2.3.1.jar;C:/Users/lohan/.m2/repository/com/sun/istack/istack-commons-runtime/3.0.7/istack-commons-runtime-3.0.7.jar;C:/Users/lohan/.m2/repository/org/jvnet/staxex/stax-ex/1.8/stax-ex-1.8.jar;C:/Users/lohan/.m2/repository/com/sun/xml/fastinfoset/FastInfoset/1.2.15/FastInfoset-1.2.15.jar'
+-encoding
+'UTF-8'
+-protected
+-source
+'17'
+-sourcepath
+'C:/Users/lohan/Documents/CashCash/ClientLourd/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2026. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'C:/Users/lohan/Documents/CashCash/ClientLourd/docs/javadoc/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'client-lourd 1.0-SNAPSHOT API'
+-use
+-version
+-windowtitle
+'client-lourd 1.0-SNAPSHOT API'

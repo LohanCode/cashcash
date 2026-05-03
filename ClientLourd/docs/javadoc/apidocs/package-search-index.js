@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.cashcash"},{"l":"com.cashcash.database"},{"l":"com.cashcash.models"},{"l":"com.cashcash.services"},{"l":"com.cashcash.web"}];updateSearchResults();

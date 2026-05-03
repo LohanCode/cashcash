@@ -2,6 +2,8 @@ package com.cashcash.models;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe représentant un matériel possédé par un client.
@@ -15,8 +17,11 @@ public class Materiel {
     private String dateInstallation;
     private double prixVente;
     private String emplacement;
+    private List<ContratMaintenance> contrats;
 
-    public Materiel() {}
+    public Materiel() {
+        this.contrats = new ArrayList<>();
+    }
 
     @XmlElement(name = "Id")
     public int getId() {
@@ -70,5 +75,17 @@ public class Materiel {
 
     public void setEmplacement(String emplacement) {
         this.emplacement = emplacement;
+    }
+
+    public List<ContratMaintenance> getContrats() {
+        return contrats;
+    }
+
+    public void setContrats(List<ContratMaintenance> contrats) {
+        this.contrats = contrats;
+    }
+
+    public void addContrat(ContratMaintenance contrat) {
+        this.contrats.add(contrat);
     }
 }
