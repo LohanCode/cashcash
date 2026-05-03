@@ -41,6 +41,14 @@
             <classifier>win</classifier>
         </dependency>
 
+        <!-- JUnit 5 pour les tests -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.0</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- MySQL JDBC Driver -->
         <dependency>
             <groupId>mysql</groupId>
