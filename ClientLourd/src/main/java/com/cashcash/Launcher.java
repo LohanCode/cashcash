@@ -13,9 +13,9 @@ public class Launcher {
 
     public static void main(String[] args) {
         try {
-            LOGGER.info("Lancement du ClientLourd CashCash...");
-            // Lancer l'interface web via JavaFX WebView
-            WebInterfaceApp.main(args);
+            LOGGER.info("Lancement du ClientLourd CashCash (Interface Native)...");
+            // Lancer l'interface native JavaFX 100% indépendante
+            MainApp.main(args);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erreur lors du lancement de l'application", e);
             System.exit(1);

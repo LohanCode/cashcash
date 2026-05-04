@@ -113,14 +113,21 @@ public class MainApp extends Application {
         // Génération du fichier XML de relance
         btnXml.setOnAction(e -> {
             if (currentClient != null) {
-                try {
-                    String path = "client_" + currentClient.getNumClient() + ".xml";
-                    XmlGenerator.generateXml(currentClient, path);
-                    LOGGER.info("Fichier XML généré : " + path);
-                    showAlert(Alert.AlertType.INFORMATION, "Succes", "Fichier XML genere : " + path);
-                } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, "Erreur lors de la génération du fichier XML", ex);
-                    showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la generation du XML.");
+                javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+                fileChooser.setTitle("Enregistrer l'export XML");
+                fileChooser.setInitialFileName("client_" + currentClient.getNumClient() + ".xml");
+                fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Fichiers XML", "*.xml"));
+                
+                java.io.File file = fileChooser.showSaveDialog(primaryStage);
+                if (file != null) {
+                    try {
+                        XmlGenerator.generateXml(currentClient, file.getAbsolutePath());
+                        LOGGER.info("Fichier XML généré : " + file.getAbsolutePath());
+                        showAlert(Alert.AlertType.INFORMATION, "Succès", "Fichier XML enregistré avec succès !");
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, "Erreur lors de la génération du fichier XML", ex);
+                        showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la génération du XML.");
+                    }
                 }
             }
         });
@@ -128,14 +135,21 @@ public class MainApp extends Application {
         // Génération de la lettre de relance PDF
         btnPdf.setOnAction(e -> {
             if (currentClient != null) {
-                try {
-                    String path = "relance_" + currentClient.getNumClient() + ".pdf";
-                    PdfGenerator.generatePdf(currentClient, path);
-                    LOGGER.info("Fichier PDF généré : " + path);
-                    showAlert(Alert.AlertType.INFORMATION, "Succes", "Fichier PDF genere : " + path);
-                } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, "Erreur lors de la génération du fichier PDF", ex);
-                    showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la generation du PDF.");
+                javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+                fileChooser.setTitle("Enregistrer la lettre de relance PDF");
+                fileChooser.setInitialFileName("relance_" + currentClient.getNumClient() + ".pdf");
+                fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf"));
+
+                java.io.File file = fileChooser.showSaveDialog(primaryStage);
+                if (file != null) {
+                    try {
+                        PdfGenerator.generatePdf(currentClient, file.getAbsolutePath());
+                        LOGGER.info("Fichier PDF généré : " + file.getAbsolutePath());
+                        showAlert(Alert.AlertType.INFORMATION, "Succès", "Fichier PDF enregistré avec succès !");
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, "Erreur lors de la génération du fichier PDF", ex);
+                        showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la génération du PDF.");
+                    }
                 }
             }
         });
