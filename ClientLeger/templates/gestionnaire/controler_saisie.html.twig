@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Saisie des contrôles - CashCash{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🔧 Rapport Technique de Contrôle</h1>
+        <a href="{{ path('app_gerant_affectation') }}" class="btn btn-outline-secondary">
+            ← Retour aux affectations
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4 bg-light">
+        <div class="card-body">
+            <h5 class="card-title text-primary">Intervention #{{ intervention.id }}</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Client :</strong> {{ client.raisSociale ?? client.numClient }}</p>
+                    {% if intervention.titre %}
+                        <p><strong>Titre :</strong> {{ intervention.titre }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {% if intervention.dateVisite %}
+                        <p><strong>Date de visite :</strong> {{ intervention.dateVisite|date('d/m/Y') }}</p>
+                    {% endif %}
+                    {% if intervention.statut %}
+                        <p><strong>Statut :</strong> <span class="badge bg-info">{{ intervention.statut }}</span></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if materiels|length == 0 %}
+        <div class="alert alert-warning">
+            Aucun matériel trouvé pour ce client. Vérifiez que le client a bien du matériel enregistré.
+        </div>
+    {% else %}
+    <form method="post">
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover align-middle bg-white mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>N° Série</th>
+                        <th>Emplacement</th>
+                        <th>Temps passé</th>
+                        <th>Commentaires / Observations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for materiel in materiels %}
+                    <tr>
+                        <td><span class="fw-bold font-monospace">{{ materiel.numSerie }}</span></td>
+                        <td><small class="text-muted">{{ materiel.emplacement ?? 'Non spécifié' }}</small></td>
+                        <td style="width: 180px;">
+                            <input type="text"
+                                   name="controles[{{ materiel.numSerie }}][tempsPasse]"
+                                   class="form-control form-control-sm"
+                                   value="{{ controles[materiel.numSerie]['temps_passe'] ?? '' }}"
+                                   placeholder="ex: 30 min">
+                        </td>
+                        <td>
+                            <textarea name="controles[{{ materiel.numSerie }}][commentaire]"
+                                      class="form-control form-control-sm"
+                                      rows="2"
+                                      placeholder="Opérations effectuées, pièces changées...">{{ controles[materiel.numSerie]['commentaire'] ?? '' }}</textarea>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-end gap-2">
+            <a href="{{ path('app_gerant_affectation') }}" class="btn btn-outline-secondary px-4">Annuler</a>
+            <button type="submit" class="btn btn-success btn-lg px-5 shadow">
+                💾 Enregistrer les contrôles
+            </button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<style>
+    body { background-color: #f8f9fa; }
+    .card { border-radius: 12px; }
+    .table thead th { border-top: none; }
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+</style>
+{% endblock %}

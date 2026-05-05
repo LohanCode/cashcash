@@ -54,7 +54,32 @@ class Materiel
         $this->controlers = new ArrayCollection();
     }
     
-    // ... [Getters/Setters pour les champs de base] ...
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getNumSerie(): ?string
+    {
+        return $this->numSerie;
+    }
+
+    public function setNumSerie(string $numSerie): static
+    {
+        $this->numSerie = $numSerie;
+        return $this;
+    }
+
+    public function getEmplacement(): ?string
+    {
+        return $this->emplacement;
+    }
+
+    public function setEmplacement(?string $emplacement): static
+    {
+        $this->emplacement = $emplacement;
+        return $this;
+    }
 
     // -----------------------------------------------------------
     // Getters/Setters pour les Relations

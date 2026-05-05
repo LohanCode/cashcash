@@ -10,16 +10,19 @@ use Doctrine\ORM\Mapping as ORM;
 class Controler
 {
     #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
     #[ORM\ManyToOne(targetEntity: Intervention::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: "num_intervenant", referencedColumnName: "id", nullable: false)]
     private ?Intervention $intervention = null;
 
-    #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Materiel::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: "num_serie", referencedColumnName: "num_serie", nullable: false)]
     private ?Materiel $materiel = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(name: "temps_passe", length: 255, nullable: true)]
     private ?string $tempsPasse = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

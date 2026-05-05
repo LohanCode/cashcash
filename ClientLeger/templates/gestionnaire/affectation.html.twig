@@ -63,6 +63,7 @@
                                 <button type="submit" class="btn btn-sm btn-primary">Affecter</button>
                                 {% if intervention.technicien %}
                                     <a href="{{ path('app_intervention_pdf', {id: intervention.id}) }}" class="btn btn-sm btn-info" target="_blank" title="Telecharger Fiche PDF">PDF</a>
+                                    <a href="{{ path('app_controler_saisie', {id: intervention.id}) }}" class="btn btn-sm btn-warning" title="Saisir les contrôles techniques">🔧 Contrôles</a>
                                 {% endif %}
                                 </div>
                             </form>
