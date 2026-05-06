@@ -19,15 +19,14 @@ public class DatabaseConnection {
      * Retourne l'instance unique de la connexion JDBC.
      */
     public static Connection getInstance() {
-        if (connection == null) {
-            try {
-                // Charger explicitement le driver
+        try {
+            if (connection == null || connection.isClosed()) {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(URL, USER, PWD);
                 System.out.println("Connexion JDBC a MySQL reussie !");
-            } catch (SQLException | ClassNotFoundException e) {
-                System.err.println("Erreur de connexion a la base de donnees : " + e.getMessage());
             }
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Erreur de connexion a la base de donnees : " + e.getMessage());
         }
         return connection;
     }

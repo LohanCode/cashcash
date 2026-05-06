@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="ContratMaintenanceTest" time="0.145" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="ContratMaintenanceTest" time="0.175" tests="13" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -15,9 +15,9 @@
     <property name="user.country" value="FR"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-21.0.10\bin"/>
-    <property name="sun.java.command" value="C:\Users\xaleo\AppData\Local\Temp\surefire13822751647965930452\surefirebooter-20260506090023781_3.jar C:\Users\xaleo\AppData\Local\Temp\surefire13822751647965930452 2026-05-06T09-00-23_576-jvmRun1 surefire-20260506090023781_1tmp surefire_0-20260506090023781_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\xaleo\AppData\Local\Temp\surefire3789861561076348003\surefirebooter-20260506094021452_3.jar C:\Users\xaleo\AppData\Local\Temp\surefire3789861561076348003 2026-05-06T09-40-21_224-jvmRun1 surefire-20260506094021452_1tmp surefire_0-20260506094021452_2tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="test" value="ContratMaintenanceTest#testIsExpired_contratExpire"/>
+    <property name="test" value="ContratMaintenanceTest"/>
     <property name="surefire.test.class.path" value="C:\Users\xaleo\cashcash\ClientLourd\target\test-classes;C:\Users\xaleo\cashcash\ClientLourd\target\classes;C:\Users\xaleo\.m2\repository\org\openjfx\javafx-controls\17.0.6\javafx-controls-17.0.6-win.jar;C:\Users\xaleo\.m2\repository\org\openjfx\javafx-graphics\17.0.6\javafx-graphics-17.0.6.jar;C:\Users\xaleo\.m2\repository\org\openjfx\javafx-fxml\17.0.6\javafx-fxml-17.0.6-win.jar;C:\Users\xaleo\.m2\repository\org\openjfx\javafx-controls\17.0.6\javafx-controls-17.0.6.jar;C:\Users\xaleo\.m2\repository\org\openjfx\javafx-web\17.0.6\javafx-web-17.0.6-win.jar;C:\Users\xaleo\.m2\repository\org\openjfx\javafx-media\17.0.6\javafx-media-17.0.6.jar;C:\Users\xaleo\.m2\repository\org\openjfx\javafx-media\17.0.6\javafx-media-17.0.6-win.jar;C:\Users\xaleo\.m2\repository\org\openjfx\javafx-graphics\17.0.6\javafx-graphics-17.0.6-win.jar;C:\Users\xaleo\.m2\repository\org\openjfx\javafx-base\17.0.6\javafx-base-17.0.6.jar;C:\Users\xaleo\.m2\repository\org\openjfx\javafx-base\17.0.6\javafx-base-17.0.6-win.jar;C:\Users\xaleo\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.0\junit-jupiter-5.10.0.jar;C:\Users\xaleo\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.0\junit-jupiter-api-5.10.0.jar;C:\Users\xaleo\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\xaleo\.m2\repository\org\junit\platform\junit-platform-commons\1.10.0\junit-platform-commons-1.10.0.jar;C:\Users\xaleo\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\xaleo\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.0\junit-jupiter-params-5.10.0.jar;C:\Users\xaleo\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.0\junit-jupiter-engine-5.10.0.jar;C:\Users\xaleo\.m2\repository\org\junit\platform\junit-platform-engine\1.10.0\junit-platform-engine-1.10.0.jar;C:\Users\xaleo\.m2\repository\com\mysql\mysql-connector-j\8.0.33\mysql-connector-j-8.0.33.jar;C:\Users\xaleo\.m2\repository\com\google\protobuf\protobuf-java\3.21.9\protobuf-java-3.21.9.jar;C:\Users\xaleo\.m2\repository\com\itextpdf\itextpdf\5.5.13.3\itextpdf-5.5.13.3.jar;C:\Users\xaleo\.m2\repository\javax\xml\bind\jaxb-api\2.3.1\jaxb-api-2.3.1.jar;C:\Users\xaleo\.m2\repository\javax\activation\javax.activation-api\1.2.0\javax.activation-api-1.2.0.jar;C:\Users\xaleo\.m2\repository\org\glassfish\jaxb\jaxb-runtime\2.3.1\jaxb-runtime-2.3.1.jar;C:\Users\xaleo\.m2\repository\org\glassfish\jaxb\txw2\2.3.1\txw2-2.3.1.jar;C:\Users\xaleo\.m2\repository\com\sun\istack\istack-commons-runtime\3.0.7\istack-commons-runtime-3.0.7.jar;C:\Users\xaleo\.m2\repository\org\jvnet\staxex\stax-ex\1.8\stax-ex-1.8.jar;C:\Users\xaleo\.m2\repository\com\sun\xml\fastinfoset\FastInfoset\1.2.15\FastInfoset-1.2.15.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="C:\Users\xaleo"/>
@@ -31,7 +31,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\xaleo\AppData\Local\Temp\surefire13822751647965930452\surefirebooter-20260506090023781_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\xaleo\AppData\Local\Temp\surefire3789861561076348003\surefirebooter-20260506094021452_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.10+8-LTS-217"/>
@@ -60,5 +60,17 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="testIsExpired_contratExpire" classname="ContratMaintenanceTest" time="0.081"/>
+  <testcase name="testIsActive_contratEnCours" classname="ContratMaintenanceTest" time="0.061"/>
+  <testcase name="testIsActive_contratPasCommence" classname="ContratMaintenanceTest" time="0.004"/>
+  <testcase name="testSetGetNumContrat" classname="ContratMaintenanceTest" time="0.01"/>
+  <testcase name="testConstructeurAvecParametres" classname="ContratMaintenanceTest" time="0.005"/>
+  <testcase name="testIsActive_contratExpire" classname="ContratMaintenanceTest" time="0.001"/>
+  <testcase name="testSetGetDateEcheance" classname="ContratMaintenanceTest" time="0.007"/>
+  <testcase name="testContratComplet" classname="ContratMaintenanceTest" time="0.001"/>
+  <testcase name="testIsExpired_contratActif" classname="ContratMaintenanceTest" time="0.001"/>
+  <testcase name="testSetGetDateSignature" classname="ContratMaintenanceTest" time="0.004"/>
+  <testcase name="testIsExpired_dateEcheanceAujourdhui" classname="ContratMaintenanceTest" time="0.005"/>
+  <testcase name="testIsExpired_contratExpire" classname="ContratMaintenanceTest" time="0.001"/>
+  <testcase name="testSetGetTypeContrat" classname="ContratMaintenanceTest" time="0.002"/>
+  <testcase name="testSetGetId" classname="ContratMaintenanceTest" time="0.003"/>
 </testsuite>
