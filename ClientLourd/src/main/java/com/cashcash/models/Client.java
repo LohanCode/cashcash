@@ -139,4 +139,9 @@ public class Client {
     public void addMateriel(Materiel m) {
         this.materiels.add(m);
     }
+
+    @Override
+    public String toString() {
+        return raisSociale != null ? raisSociale : "Client sans nom";
+    }
 }

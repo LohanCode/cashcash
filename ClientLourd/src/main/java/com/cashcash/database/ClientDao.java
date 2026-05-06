@@ -3,161 +3,212 @@ package com.cashcash.database;
 import com.cashcash.models.Client;
 import com.cashcash.models.Materiel;
 import com.cashcash.models.ContratMaintenance;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.logging.Logger;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/**
- * Data Access Object pour Client et ses Matériels.
- */
 public class ClientDao {
 
     private static final Logger LOGGER = Logger.getLogger(ClientDao.class.getName());
 
-    /**
-     * Recherche un client par son NumClient et charge ses matériels.
-     * 
-     * @param numClient l'identifiant métier du client
-     * @return un objet Client rempli, ou null si introuvable
-     */
+    public List<Client> getAllClients() {
+        List<Client> clients = new ArrayList<>();
+        String sql = "SELECT id, num_client, rais_sociale FROM client ORDER BY rais_sociale";
+        try (Connection conn = DatabaseConnection.getInstance()) {
+            if (conn != null) {
+                try (Statement stmt = conn.createStatement();
+                     ResultSet rs = stmt.executeQuery(sql)) {
+                    while (rs.next()) {
+                        Client c = new Client();
+                        c.setId(rs.getInt("id"));
+                        c.setNumClient(rs.getString("num_client"));
+                        c.setRaisSociale(rs.getString("rais_sociale"));
+                        clients.add(c);
+                    }
+                }
+            } else {
+                LOGGER.severe("Connexion MySQL impossible (null)");
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Erreur getAllClients", e);
+        }
+        return clients;
+    }
+
     public Client getClientByNum(String numClient) {
-        if (numClient == null || numClient.trim().isEmpty()) {
-            LOGGER.warning("NumClient vide ou null fourni à getClientByNum");
-            return null;
-        }
-
         Client client = null;
-        Connection conn = DatabaseConnection.getInstance();
-        if (conn == null) {
-            LOGGER.severe("Impossible de récupérer la connexion à la base de données");
-            return null;
-        }
-
-        String queryClient = "SELECT * FROM client WHERE num_client = ?";
-
-        try (PreparedStatement pstmt = conn.prepareStatement(queryClient)) {
+        String sql = "SELECT id, num_client, rais_sociale FROM client WHERE num_client = ?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, numClient);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     client = new Client();
-                    try {
-                        client.setId(rs.getInt("id"));
-                        client.setNumClient(rs.getString("num_client"));
-                        client.setRaisSociale(rs.getString("rais_sociale"));
-                        client.setSiren(rs.getString("siren"));
-                        client.setCodeApe(rs.getInt("code_ape"));
-                        client.setAdresseClient(rs.getString("adresse_client"));
-                        client.setTelephoneClient(rs.getString("telephone_client"));
-                        client.setEmailClient(rs.getString("email_client"));
-                        client.setDureeDeplacement(rs.getString("duree_deplacement"));
-                        client.setDistanceKm(rs.getDouble("distance_km"));
-
-                        // Charger le matériel et les contrats associés
-                        chargerMateriels(client, conn);
-                        LOGGER.info("Client " + numClient + " chargé avec succès");
-                    } catch (NumberFormatException e) {
-                        LOGGER.log(Level.SEVERE,
-                                "Erreur de conversion de type lors du chargement du client " + numClient, e);
-                        return null;
-                    }
-                } else {
-                    LOGGER.warning("Aucun client trouvé avec NumClient: " + numClient);
+                    client.setId(rs.getInt("id"));
+                    client.setNumClient(rs.getString("num_client"));
+                    client.setRaisSociale(rs.getString("rais_sociale"));
+                    chargerMateriels(client, conn);
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Erreur SQL lors de la recherche du client " + numClient, e);
+            LOGGER.log(Level.SEVERE, "ERREUR SQL dans getClientByNum : " + e.getMessage(), e);
         }
-
         return client;
     }
 
     private void chargerMateriels(Client client, Connection conn) {
-        String query = "SELECT * FROM materiel WHERE client_id = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+        String sql = "SELECT id, num_serie FROM materiel WHERE client_id = ?"; 
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, client.getId());
             try (ResultSet rs = pstmt.executeQuery()) {
+                int count = 0;
                 while (rs.next()) {
-                    try {
-                        Materiel m = new Materiel();
-                        m.setId(rs.getInt("id"));
-                        m.setNumSerie(rs.getString("num_serie"));
-                        m.setDateVente(rs.getString("date_vente"));
-                        m.setDateInstallation(rs.getString("date_installation"));
-                        m.setPrixVente(rs.getDouble("prix_vente"));
-                        m.setEmplacement(rs.getString("emplacement"));
+                    Materiel m = new Materiel();
+                    m.setId(rs.getInt("id"));
+                    m.setNumSerie(rs.getString("num_serie"));
+                    chargerContrats(m, conn);
+                    client.addMateriel(m);
+                    count++;
+                }
+                LOGGER.info(count + " matériels chargés pour le client.");
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "ERREUR SQL dans chargerMateriels : " + e.getMessage(), e);
+        }
+    }
 
-                        // Charger les contrats de maintenance associés
-                        chargerContratsMaintenanceParMateriel(m, conn);
-
-                        client.addMateriel(m);
-                        LOGGER.fine("Matériel " + m.getNumSerie() + " chargé pour le client " + client.getNumClient());
-                    } catch (NumberFormatException e) {
-                        LOGGER.log(Level.WARNING, "Erreur de conversion lors du chargement d'un matériel", e);
-                        continue;
+    private void chargerContrats(Materiel m, Connection conn) {
+        String sql = "SELECT id, date_echeance FROM contrat_maintenance WHERE materiel_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, m.getId());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    ContratMaintenance c = new ContratMaintenance();
+                    c.setId(rs.getInt("id"));
+                    Date dateExp = rs.getDate("date_echeance");
+                    if (dateExp != null) {
+                        c.setDateEcheance(dateExp.toLocalDate());
                     }
+                    m.addContrat(c);
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Erreur SQL lors du chargement des matériels pour le client " + client.getId(), e);
+            LOGGER.log(Level.SEVERE, "Erreur chargerContrats : " + e.getMessage(), e);
         }
     }
 
     /**
-     * Charge les contrats de maintenance d'un matériel.
-     * 
-     * @param materiel le matériel dont on veut charger les contrats
-     * @param conn     la connexion à la base de données
+     * Ajoute un nouveau matériel pour un client donné.
+     * @param numSerie le numéro de série du matériel
+     * @param clientId l'ID du client propriétaire
+     * @return true si l'insertion a réussi
      */
-    private void chargerContratsMaintenanceParMateriel(Materiel materiel, Connection conn) {
-        String query = "SELECT cm.* FROM contrat_maintenance cm " +
-                "WHERE cm.materiel_id = ? ORDER BY cm.date_echeance DESC";
-        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, materiel.getId());
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    try {
-                        ContratMaintenance contrat = new ContratMaintenance();
-                        contrat.setId(rs.getInt("id"));
-                        contrat.setNumContrat(rs.getString("num_contrat"));
+    public boolean ajouterMateriel(String numSerie, int clientId, int typeMaterielId) {
+        String sql = "INSERT INTO materiel (num_serie, client_id, type_materiel_id) VALUES (?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, numSerie);
+            pstmt.setInt(2, clientId);
+            pstmt.setInt(3, typeMaterielId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Erreur ajouterMateriel : " + e.getMessage(), e);
+            return false;
+        }
+    }
 
-                        // Conversion sécurisée des dates
-                        try {
-                            String dateSignature = rs.getString("date_signature");
-                            if (dateSignature != null) {
-                                contrat.setDateSignature(LocalDate.parse(dateSignature));
-                            }
-                        } catch (DateTimeParseException e) {
-                            LOGGER.log(Level.WARNING, "Format de date invalide pour date_signature", e);
-                        }
-
-                        try {
-                            String dateEcheance = rs.getString("date_echeance");
-                            if (dateEcheance != null) {
-                                contrat.setDateEcheance(LocalDate.parse(dateEcheance));
-                            }
-                        } catch (DateTimeParseException e) {
-                            LOGGER.log(Level.WARNING, "Format de date invalide pour date_echeance", e);
-                        }
-
-                        // Ajout du contrat au matériel
-                        materiel.addContrat(contrat);
-
-                        LOGGER.fine(
-                                "Contrat " + contrat.getNumContrat() + " chargé pour le matériel " + materiel.getId());
-                    } catch (Exception e) {
-                        LOGGER.log(Level.WARNING, "Erreur lors du chargement d'un contrat de maintenance", e);
-                        continue;
-                    }
-                }
+    /**
+     * Retourne tous les types de matériels disponibles sous forme de paires ID/Libellé.
+     */
+    public java.util.Map<Integer, String> getAllTypesMateriel() {
+        java.util.Map<Integer, String> types = new java.util.LinkedHashMap<>();
+        String sql = "SELECT id, libelle_type_materiel FROM type_materiel ORDER BY libelle_type_materiel";
+        try (Connection conn = DatabaseConnection.getInstance();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                types.put(rs.getInt("id"), rs.getString("libelle_type_materiel"));
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Erreur SQL lors du chargement des contrats de maintenance", e);
+            LOGGER.log(Level.SEVERE, "Erreur getAllTypesMateriel : " + e.getMessage(), e);
+        }
+        return types;
+    }
+
+    /** Retourne les familles disponibles (ID → libellé). */
+    public java.util.Map<Integer, String> getAllFamilles() {
+        java.util.Map<Integer, String> familles = new java.util.LinkedHashMap<>();
+        String sql = "SELECT id, libelle_famille FROM famille ORDER BY libelle_famille";
+        try (Connection conn = DatabaseConnection.getInstance();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                familles.put(rs.getInt("id"), rs.getString("libelle_famille"));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Erreur getAllFamilles : " + e.getMessage(), e);
+        }
+        return familles;
+    }
+
+    /** Ajoute un nouveau type de matériel en base (vérifie les doublons). */
+    public boolean ajouterTypeMateriel(String libelle, String refInterne, int familleId) {
+        // Vérifier si un type avec le même libellé existe déjà
+        String checkSql = "SELECT COUNT(*) FROM type_materiel WHERE libelle_type_materiel = ?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement pstmtCheck = conn.prepareStatement(checkSql)) {
+            pstmtCheck.setString(1, libelle);
+            try (ResultSet rs = pstmtCheck.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    LOGGER.warning("Type de matériel '" + libelle + "' existe déjà.");
+                    return false; // doublon détecté
+                }
+            }
+            // Pas de doublon → on insère
+            String sql = "INSERT INTO type_materiel (libelle_type_materiel, ref_interne, famille_id) VALUES (?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, libelle);
+                pstmt.setString(2, refInterne);
+                pstmt.setInt(3, familleId);
+                return pstmt.executeUpdate() > 0;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Erreur ajouterTypeMateriel : " + e.getMessage(), e);
+            return false;
+        }
+    }
+
+    public boolean ajouterContratMaintenance(String numSerie) {
+        // 1. Récupérer l'ID du matériel à partir de son numéro de série
+        int materielId = -1;
+        String findIdSql = "SELECT id FROM materiel WHERE num_serie = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement pstmtFind = conn.prepareStatement(findIdSql)) {
+            pstmtFind.setString(1, numSerie);
+            try (ResultSet rs = pstmtFind.executeQuery()) {
+                if (rs.next()) materielId = rs.getInt("id");
+            }
+            
+            if (materielId == -1) {
+                LOGGER.warning("Matériel introuvable pour le numéro de série : " + numSerie);
+                return false;
+            }
+
+            // 2. Insérer le contrat avec materiel_id et un numéro de contrat auto-généré
+            String insertSql = "INSERT INTO contrat_maintenance (date_signature, date_echeance, materiel_id, num_contrat) " +
+                               "VALUES (CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR), ?, ?)";
+            
+            try (PreparedStatement pstmtInsert = conn.prepareStatement(insertSql)) {
+                pstmtInsert.setInt(1, materielId);
+                pstmtInsert.setString(2, "CTR-" + System.currentTimeMillis());
+                return pstmtInsert.executeUpdate() > 0;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "ERREUR CRÉATION CONTRAT : " + e.getMessage(), e);
+            return false;
         }
     }
 }
